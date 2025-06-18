@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../AuthContext";
 
@@ -8,20 +8,28 @@ export default function MemberPanel() {
   const [clubName, setClubName] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchClubName = async () => {
+    const checkMembership = async () => {
       if (!user) return;
 
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      const userData = userDoc.data();
-      const clubId = userData?.clubId;
+      try {
+        const clubsSnapshot = await getDocs(collection(db, "clubs"));
 
-      if (clubId) {
-        const clubDoc = await getDoc(doc(db, "clubs", clubId));
-        setClubName(clubDoc.data()?.name || null);
+        for (const clubDoc of clubsSnapshot.docs) {
+          const clubId = clubDoc.id;
+          const memberDocRef = doc(db, `clubs/${clubId}/members/${user.uid}`);
+          const memberDocSnap = await getDoc(memberDocRef);
+
+          if (memberDocSnap.exists()) {
+            setClubName(clubDoc.data().name);
+            break; // stop once found
+          }
+        }
+      } catch (error) {
+        console.error("Error checking club membership:", error);
       }
     };
 
-    fetchClubName();
+    checkMembership();
   }, [user]);
 
   return (

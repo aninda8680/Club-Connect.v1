@@ -7,7 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 import AdminPanel from "../components/AdminPanel";
 import ClubList from "../components/ClubList";
 import LeaderPanel from "../components/LeaderPanel";
-import UserPanel from "../components/MemberPanel";
+import MemberPanel from "../components/MemberPanel";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -41,7 +41,7 @@ export default function Dashboard() {
         return (
         <>
         <p className="text-blue-400">👥 Club Member Dashboard</p>;
-        <UserPanel/>
+        <MemberPanel/>
         </>
         );
 
@@ -67,7 +67,10 @@ export default function Dashboard() {
 
       {/*Show thw Admin Panel if user is admin*/}
       {role === "admin" && <AdminPanel />}
-      <ClubList/>
+      {role === "leader" && <LeaderPanel />}
+      {role === "member" && <MemberPanel />}
+      {role === "visitor" && <ClubList/>}
+      
     </div>
   );
 }
