@@ -9,8 +9,8 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "../firebase";
-import { useAuth } from "../AuthContext";
+import { db } from "../../firebase";
+import { useAuth } from "../../AuthContext";
 
 export default function LeaderPanel() {
   const { user } = useAuth();

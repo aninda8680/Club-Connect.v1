@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
-import { useAuth } from "../AuthContext";
+import { db } from "../../firebase";
+import { useAuth } from "../../AuthContext";
 
 export default function MemberPanel() {
   const { user } = useAuth();

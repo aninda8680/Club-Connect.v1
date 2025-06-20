@@ -4,10 +4,10 @@ import { auth, db } from "../firebase";
 import { useAuth } from "../AuthContext";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import AdminPanel from "../components/AdminPanel";
+import AdminPanel from "../components/Panels/AdminPanel";
 import ClubList from "../components/ClubList";
-import LeaderPanel from "../components/LeaderPanel";
-import MemberPanel from "../components/MemberPanel";
+import LeaderPanel from "../components/Panels/LeaderPanel";
+import MemberPanel from "../components/Panels/MemberPanel";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -68,7 +68,6 @@ export default function Dashboard() {
       {/*Show thw Admin Panel if user is admin*/}
       {role === "admin" && <AdminPanel />}
       {role === "leader" && <LeaderPanel />}
-      {role === "member" && <MemberPanel />}
       {role === "visitor" && <ClubList/>}
       
     </div>

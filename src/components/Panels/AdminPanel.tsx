@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where, addDoc, Timestamp } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 
 export default function AdminPanel() {
   const [leaders, setLeaders] = useState<any[]>([]);
