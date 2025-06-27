@@ -4,10 +4,12 @@ import { auth, db } from "../firebase";
 import { useAuth } from "../AuthContext";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import AdminPanel from "../components/Panels/AdminPanel";
+import AdminPanel from "../components/Panels/ADMIN/AdminPanel";
 import ClubList from "../components/ClubList";
-import LeaderPanel from "../components/Panels/LeaderPanel";
-import MemberPanel from "../components/Panels/MemberPanel";
+import LeaderPanel from "../components/Panels/LEADER/LeaderPanel";
+import MemberPanel from "../components/Panels/MEMBER/MemberPanel";
+import LeaderEventsPanel from "../components/Panels/LEADER/LeaderEventsPanel";
+import Navbar from "../components/Navbar";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -54,21 +56,20 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-screen bg-gray-900 text-white p-8">
+      <Navbar />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Welcome, {user?.displayName}</h1>
-        <button
-          onClick={() => signOut(auth)}
-          className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
-        >
-          Logout
-        </button>
+        
       </div>
       <div className="text-lg">{renderRoleComponent()}</div>
 
-      {/*Show thw Admin Panel if user is admin*/}
       {role === "admin" && <AdminPanel />}
-      {role === "leader" && <LeaderPanel />}
+
       {role === "visitor" && <ClubList/>}
+
+      
+
+      
       
     </div>
   );

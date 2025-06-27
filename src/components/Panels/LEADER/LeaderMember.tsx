@@ -9,16 +9,19 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "../../firebase";
-import { useAuth } from "../../AuthContext";
+import { db } from "../../../firebase";
+import { useAuth } from "../../../AuthContext";
+import Navbar from "../../Navbar";
+import toast from "react-hot-toast"; 
 
-export default function LeaderPanel() {
+
+export default function LeaderMember() {
   const { user } = useAuth();
   const [clubId, setClubId] = useState<string | null>(null);
   const [joinRequests, setJoinRequests] = useState<any[]>([]);
   const [members, setMembers] = useState<any[]>([]);
 
-  // Step 1: Find leader's club
+  // Fetch the leader's club ID
   useEffect(() => {
     const fetchClub = async () => {
       if (user) {
@@ -33,12 +36,11 @@ export default function LeaderPanel() {
     fetchClub();
   }, [user]);
 
-  // Step 2: Load join requests
+  // Load join requests
   useEffect(() => {
     const fetchJoinRequests = async () => {
       if (!clubId) return;
-      const q = collection(db, `clubs/${clubId}/joinRequests`);
-      const snap = await getDocs(q);
+      const snap = await getDocs(collection(db, `clubs/${clubId}/joinRequests`));
       const data = snap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -48,7 +50,7 @@ export default function LeaderPanel() {
     fetchJoinRequests();
   }, [clubId]);
 
-  // Step 3: Load members
+  // Load club members
   useEffect(() => {
     const fetchMembers = async () => {
       if (!clubId) return;
@@ -62,48 +64,55 @@ export default function LeaderPanel() {
     fetchMembers();
   }, [clubId]);
 
+  // Accept a user
   const handleAccept = async (userId: string, name: string, email: string) => {
     try {
       await setDoc(doc(db, "users", userId), { role: "member" }, { merge: true });
       await setDoc(doc(db, `clubs/${clubId}/members/${userId}`), {
-        name : name,
-        email : email,
+        name,
+        email,
         joinedAt: Timestamp.now(),
       });
       await deleteDoc(doc(db, `clubs/${clubId}/joinRequests/${userId}`));
       setJoinRequests((prev) => prev.filter((r) => r.id !== userId));
       setMembers((prev) => [...prev, { id: userId, name, email }]);
-      alert("✅ User accepted");
+      toast.success("✅ User accepted");
     } catch (err) {
       console.error("❌ Failed to accept user:", err);
-      alert("Failed to accept user.");
+      toast.error("Failed to accept user.");
     }
   };
 
+  // Reject a user
   const handleReject = async (userId: string) => {
     try {
       await deleteDoc(doc(db, `clubs/${clubId}/joinRequests/${userId}`));
       setJoinRequests((prev) => prev.filter((r) => r.id !== userId));
-      alert("User rejected.");
+      toast.success("❌ User rejected");
     } catch (err) {
       console.error("❌ Failed to reject user:", err);
+      toast.error("Failed to accept user.")
     }
   };
 
+  // Remove a member
   const handleRemoveMember = async (userId: string) => {
     try {
       await deleteDoc(doc(db, `clubs/${clubId}/members/${userId}`));
       await setDoc(doc(db, `users/${userId}`), { role: "visitor" }, { merge: true });
       setMembers((prev) => prev.filter((m) => m.id !== userId));
-      alert("❌ Member removed");
+      toast.success("❌ Member removed");
     } catch (err) {
       console.error("❌ Failed to remove member:", err);
+      toast.error("Failed to remove member.");
     }
   };
 
   return (
-    <div className="mt-6 bg-gray-800 p-6 rounded-lg text-white">
-      <h2 className="text-xl font-bold mb-4">Join Requests</h2>
+    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-4 sm:p-6 lg:p-8">
+        <Navbar/>
+        <div className="max-w-4xl mx-auto space-y-8">
+      <h2 className="text-2xl font-bold mb-6">Join Requests</h2>
       {joinRequests.length === 0 ? (
         <p>No join requests.</p>
       ) : (
@@ -117,10 +126,10 @@ export default function LeaderPanel() {
               <button
                 onClick={() =>
                   handleAccept(
-                                req.id,
-                                req.name || req.displayName || req.email || req.id,
-                                req.email || ""
-                              )
+                    req.id,
+                    req.name || req.displayName || req.email || req.id,
+                    req.email || ""
+                  )
                 }
                 className="bg-green-600 px-3 py-1 rounded mr-2"
               >
@@ -133,11 +142,12 @@ export default function LeaderPanel() {
                 Reject
               </button>
             </div>
+            
           </div>
         ))
       )}
 
-      <h2 className="text-xl font-bold mt-8 mb-4">Club Members</h2>
+      <h2 className="text-2xl font-bold mt-8 mb-6">Club Members</h2>
       {members.length === 0 ? (
         <p>No members yet.</p>
       ) : (
@@ -147,10 +157,8 @@ export default function LeaderPanel() {
             className="flex justify-between items-center bg-gray-700 p-3 rounded mb-2"
           >
             <p>
-              {member.name || member.email} 
-            
-                
-             
+              {member.name || member.email} (
+              {member.joinedAt?.toDate().toLocaleDateString()})
             </p>
             <button
               onClick={() => handleRemoveMember(member.id)}
@@ -161,6 +169,7 @@ export default function LeaderPanel() {
           </div>
         ))
       )}
+      </div>
     </div>
   );
 }
