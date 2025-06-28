@@ -24,6 +24,9 @@ import {
   EyeOff,
 } from "lucide-react";
 
+import { Link } from "react-router-dom";
+
+
 export default function AdminPanel() {
   const [leaders, setLeaders] = useState<any[]>([]);
   const [clubName, setClubName] = useState("");
@@ -126,7 +129,7 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="max-h-screen bg gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       {/* Notification Toast */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
@@ -154,7 +157,7 @@ export default function AdminPanel() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm font-medium">Total Clubs</p>
@@ -166,7 +169,7 @@ export default function AdminPanel() {
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm font-medium">Available Leaders</p>
@@ -178,7 +181,7 @@ export default function AdminPanel() {
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm font-medium">Active Leaders</p>
@@ -301,16 +304,7 @@ export default function AdminPanel() {
                     <p className="text-slate-400">Manage existing clubs</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setShowClubList(!showClubList)}
-                  className="p-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-all duration-200"
-                >
-                  {showClubList ? (
-                    <EyeOff className="w-5 h-5 text-slate-400" />
-                  ) : (
-                    <Eye className="w-5 h-5 text-slate-400" />
-                  )}
-                </button>
+                
               </div>
             </div>
 
@@ -325,47 +319,49 @@ export default function AdminPanel() {
                 ) : (
                   <div className="space-y-4">
                     {clubs.map((club) => (
-                      <div
-                        key={club.id}
-                        className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-4 hover:bg-slate-700/70 transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                                <Building2 className="w-4 h-4 text-white" />
+                      <div key={club.id} className="flex items-center gap-4">
+                        <Link
+                          to={`/admin/clubs/${club.id}`} key={club.id}
+                          className="flex-1 block bg-slate-700/50 border border-slate-600/50 rounded-xl p-4 hover:bg-slate-700/70 transition-all duration-200 hover:cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                                  <Building2 className="w-4 h-4 text-white" />
+                                </div>
+                                <h3 className="font-semibold text-white text-lg">{club.name}</h3>
                               </div>
-                              <h3 className="font-semibold text-white text-lg">{club.name}</h3>
-                            </div>
-                            <div className="space-y-1 text-sm">
-                              <div className="flex items-center gap-2 text-slate-300">
-                                <Crown className="w-4 h-4 text-purple-400" />
-                                <span>Leader: {getLeaderName(club.leaderId)}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-slate-400">
-                                <Calendar className="w-4 h-4 text-blue-400" />
-                                <span>
-                                  Created:{" "}
-                                  {club.createdAt?.toDate
-                                    ? club.createdAt.toDate().toLocaleDateString()
-                                    : "N/A"}
-                                </span>
+                              <div className="space-y-1 text-sm">
+                                <div className="flex items-center gap-2 text-slate-300">
+                                  <Crown className="w-4 h-4 text-purple-400" />
+                                  <span>Leader: {getLeaderName(club.leaderId)}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-400">
+                                  <Calendar className="w-4 h-4 text-blue-400" />
+                                  <span>
+                                    Created:{" "}
+                                    {club.createdAt?.toDate
+                                      ? club.createdAt.toDate().toLocaleDateString()
+                                      : "N/A"}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          <button
-                            onClick={() => confirmDelete(club.id, club.name)}
-                            disabled={deletingClub === club.id}
-                            className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 disabled:opacity-50"
-                          >
-                            {deletingClub === club.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-4 h-4" />
-                            )}
-                            <span className="hidden sm:inline">Delete</span>
-                          </button>
-                        </div>
+                        </Link>
+                        <button
+                          onClick={() => confirmDelete(club.id, club.name)}
+                          disabled={deletingClub === club.id}
+                          className="bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 disabled:opacity-50"
+                        >
+                          {deletingClub === club.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                          <span className="hidden sm:inline">Delete</span>
+                        </button>
                       </div>
                     ))}
                   </div>

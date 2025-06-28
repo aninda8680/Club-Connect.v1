@@ -18,39 +18,47 @@ export default function PublicEventList() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [interestedEvents, setInterestedEvents] = useState<Set<string>>(new Set());
+  const [selectedClub, setSelectedClub] = useState<string>("All");
+  const [clubNames, setClubNames] = useState<string[]>([]);
+
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const clubsSnapshot = await getDocs(collection(db, "clubs"));
-        let allEvents: any[] = [];
+  const fetchEvents = async () => {
+    try {
+      const clubsSnapshot = await getDocs(collection(db, "clubs"));
+      let allEvents: any[] = [];
+      const clubSet = new Set<string>();
 
-        for (const clubDoc of clubsSnapshot.docs) {
-          const clubId = clubDoc.id;
-          const eventsRef = collection(db, `clubs/${clubId}/events`);
-          const eventsSnap = await getDocs(eventsRef);
+      for (const clubDoc of clubsSnapshot.docs) {
+        const clubId = clubDoc.id;
+        const clubName = clubDoc.data().name || "Unnamed Club";
+        clubSet.add(clubName);
 
-          const eventsData = eventsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            clubName: clubDoc.data().name || "Unnamed Club",
-            // If your events have an 'icon' field as a string, map it to a component
-            icon: ICON_MAP[(doc.data().icon as string) || "Sparkles"] || Sparkles,
-          }));
+        const eventsRef = collection(db, `clubs/${clubId}/events`);
+        const eventsSnap = await getDocs(eventsRef);
 
-          allEvents = [...allEvents, ...eventsData];
-        }
+        const eventsData = eventsSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          clubName: clubName,
+          icon: ICON_MAP[(doc.data().icon as string) || "Sparkles"] || Sparkles,
+        }));
 
-        setEvents(allEvents);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      } finally {
-        setLoading(false);
+        allEvents = [...allEvents, ...eventsData];
       }
-    };
 
-    fetchEvents();
-  }, []);
+      setClubNames(["All", ...Array.from(clubSet).sort()]);
+      setEvents(allEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchEvents();
+}, []);
+
 
   // Handler for marking interest
   const handleInterested = (eventId: string) => {
@@ -78,7 +86,8 @@ export default function PublicEventList() {
 
   if (events.length === 0) {
     return (
-      
+
+
       <div className="relative overflow-hidden ">
         <Navbar/>
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-2xl"></div>
@@ -96,7 +105,7 @@ export default function PublicEventList() {
   }
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6 lg:p-8">
+    <div className="m-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="relative overflow-hidden bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-sm rounded-3xl p-6 sm:p-8 lg:p-10 border border-slate-700/30">
@@ -119,9 +128,26 @@ export default function PublicEventList() {
           <div className="absolute -bottom-6 -left-6 w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 bg-purple-500/20 rounded-full blur-2xl"></div>
         </div>
 
+        {/* Filter Dropdown */}
+        <div className="flex justify-end mb-4">
+          <select
+            value={selectedClub}
+            onChange={(e) => setSelectedClub(e.target.value)}
+            className="bg-slate-800 border border-slate-600 text-white px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {clubNames.map((club) => (
+              <option key={club} value={club}>
+                {club}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Events Grid */}
         <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
-          {events.map((event, index) => {
+          {events
+                  .filter((event) => selectedClub === "All" || event.clubName === selectedClub)
+                  .map((event, index) => {
             const IconComponent = event.icon;
             return (
               <div

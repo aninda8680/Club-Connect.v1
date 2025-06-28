@@ -38,9 +38,14 @@ export default function Navbar() {
         </Link>
 
         {role === "admin" && (
+            <>
           <Link to="/admin" className="hover:text-yellow-400">
             Admin Panel
           </Link>
+          <Link to="/AdminEvents" className="hover:text-yellow-400">
+            Events
+          </Link>
+          </>
         )}
 
         {role === "leader" && (
@@ -52,6 +57,12 @@ export default function Navbar() {
               Members
             </Link>
           </>
+        )}
+
+        {role === "member" && (
+          <Link to="/events" className="hover:text-yellow-400">
+            Events
+          </Link>
         )}
 
         {role === "visitor" && (

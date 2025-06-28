@@ -48,14 +48,14 @@ export default function Dashboard() {
         );
 
       case "visitor":
-        return <p className="text-gray-400">👀 Visitor View</p>;
+        return <p className="text-gray-400">Hii, newbie!</p>;
       default:
         return <p>Loading role...</p>;
     }
   };
 
   return (
-    <div className="min-h-screen w-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-4 sm:p-6 lg:p-8">
       <Navbar />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Welcome, {user?.displayName}</h1>
