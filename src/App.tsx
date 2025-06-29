@@ -9,6 +9,7 @@ import LeaderMember from "./components/Panels/LEADER/LeaderMember";
 import AdminClubDash from "./components/Panels/ADMIN/AdminClubDash";
 import NotAuthorized from "./pages/NotAuthorized"; //for not auhtorization
 import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
+import Profile from "./pages/Profile";
 
 export default function App() {
   return (
@@ -59,6 +60,8 @@ export default function App() {
 
       {/* Optional: catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="/Profile" element={<Profile />} />
 
       <Route
         path="/AdminEvents"
