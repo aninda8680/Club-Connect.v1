@@ -69,12 +69,7 @@ export default function Navbar() {
             <Link to="/profile" className="text-white hover:text-yellow-400 text-2xl">
               <FaUserCircle />
             </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
+            
           </>
         )}
       </div>

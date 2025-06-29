@@ -86,7 +86,9 @@ export default function Profile() {
   };
 
   return (
-    <div className="max-h-screen w-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 p-4 md:p-8">
+        <div className="min-h-screen w-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 p-4 md:p-8">
+
+    <div className="">
       <Navbar/>
       <div className="max-w-4xl mx-auto">
         {/* Header with animated gradient */}
@@ -206,6 +208,7 @@ export default function Profile() {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }
