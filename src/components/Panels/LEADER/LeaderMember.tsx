@@ -101,7 +101,7 @@ export default function LeaderMember() {
       await deleteDoc(doc(db, `clubs/${clubId}/members/${userId}`));
       await setDoc(doc(db, `users/${userId}`), { role: "visitor" }, { merge: true });
       setMembers((prev) => prev.filter((m) => m.id !== userId));
-      toast.success("❌ Member removed");
+      toast.success(" Member removed");
     } catch (err) {
       console.error("❌ Failed to remove member:", err);
       toast.error("Failed to remove member.");

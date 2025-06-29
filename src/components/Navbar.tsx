@@ -5,7 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { Typewriter } from 'react-simple-typewriter';
-import LeaderEventsPanel from "./Panels/LEADER/LeaderEventsPanel";
+import { FaUserCircle } from "react-icons/fa"; // import profile icon
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -28,29 +28,28 @@ export default function Navbar() {
   };
 
   return (
-    <nav className=" max-h-screen max-w-screen bg-0 text-white p-4 flex justify-between items-center">
+    <nav className="max-h-screen max-w-screen bg-0 text-white p-4 flex justify-between items-center">
       <div className="text-xl font-bold">Club Connect</div>
-      
 
-      <div className="space-x-6">
+      <div className="flex items-center space-x-6">
         <Link to="/dashboard" className="hover:text-yellow-400">
           Dashboard
         </Link>
 
         {role === "admin" && (
-            <>
-          <Link to="/admin" className="hover:text-yellow-400">
-            Admin Panel
-          </Link>
-          <Link to="/AdminEvents" className="hover:text-yellow-400">
-            Events
-          </Link>
+          <>
+            <Link to="/admin" className="hover:text-yellow-400">
+              Admin Panel
+            </Link>
+            <Link to="/AdminEvents" className="hover:text-yellow-400">
+              Events
+            </Link>
           </>
         )}
 
         {role === "leader" && (
           <>
-            <Link to='/LeaderEvents' className="hover:text-yellow-400">
+            <Link to="/LeaderEvents" className="hover:text-yellow-400">
               Events
             </Link>
             <Link to="/manage" className="hover:text-yellow-400">
@@ -59,25 +58,24 @@ export default function Navbar() {
           </>
         )}
 
-        {role === "member" && (
-          <Link to="/events" className="hover:text-yellow-400">
-            Events
-          </Link>
-        )}
-
-        {role === "visitor" && (
+        {(role === "member" || role === "visitor") && (
           <Link to="/events" className="hover:text-yellow-400">
             Events
           </Link>
         )}
 
         {user && (
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
-          >
-            Logout
-          </button>
+          <>
+            <Link to="/profile" className="text-white hover:text-yellow-400 text-2xl">
+              <FaUserCircle />
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
+            >
+              Logout
+            </button>
+          </>
         )}
       </div>
     </nav>

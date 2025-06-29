@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, getDocs, collection, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, updateDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useAuth } from "../../../AuthContext";
 import {
@@ -80,8 +80,8 @@ export default function AdminClubDash() {
   }
 
 
-  async function handleChangeLeader() {
-  if (!clubId) return;
+  async function handleChangeLeader(club: any) {
+  if (!clubId || !club?.leaderId) return;
 
   const eligibleUsersSnap = await getDocs(collection(db, "users"));
   const eligibleUsers = eligibleUsersSnap.docs
@@ -100,22 +100,32 @@ export default function AdminClubDash() {
   if (!newLeader) return alert("❌ No user found with this email.");
 
   try {
-    // Update club's leaderId
-    await updateDoc(doc(db, "clubs", clubId), {
-      leaderId: newLeader.id,
+    // Fetch current leader info
+    const currentLeaderDoc = await getDoc(doc(db, "users", club.leaderId));
+    const currentLeader = currentLeaderDoc.data();
+
+    // 1. Demote current leader
+    await updateDoc(doc(db, "users", club.leaderId), {
+      role: "member",
     });
 
-    // Promote new leader
+    // 2. Add demoted leader to /members if not already
+    await setDoc(doc(db, `clubs/${clubId}/members/${club.leaderId}`), {
+      displayName: currentLeader?.displayName || "",
+      email: currentLeader?.email || "",
+      role: "member",
+      joinedAt: new Date(),
+    });
+
+    // 3. Promote new leader
     await updateDoc(doc(db, "users", newLeader.id), {
       role: "leader",
     });
 
-    // Optionally demote old leader (if you want)
-    if (club?.leaderId) {
-      await updateDoc(doc(db, "users", club.leaderId), {
-        role: "member",
-      });
-    }
+    // 4. Update club's leaderId
+    await updateDoc(doc(db, "clubs", clubId), {
+      leaderId: newLeader.id,
+    });
 
     alert("✅ Club leader changed successfully.");
     window.location.reload();
@@ -124,6 +134,7 @@ export default function AdminClubDash() {
     alert("❌ Failed to change leader.");
   }
 }
+
 
 
   return (
@@ -268,7 +279,8 @@ export default function AdminClubDash() {
           </p>
         </div>
         <button
-          onClick={handleChangeLeader}
+          onClick={() => handleChangeLeader(club)}
+
           className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded text-sm"
         >
           🔁 Change Leader
