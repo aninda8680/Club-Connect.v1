@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export default function AdminClubDash() {
-  const { user } = useAuth();
+  useAuth();
   const { clubId } = useParams();
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ export default function AdminClubDash() {
   const [leader, setLeader] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function AdminClubDash() {
       } catch (error) {
         console.error("Error loading club data:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
@@ -152,7 +152,7 @@ export default function AdminClubDash() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 {club?.name}
               </h1>
               <p className="text-slate-400 text-lg">Comprehensive club management and analytics</p>
