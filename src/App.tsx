@@ -10,9 +10,11 @@ import AdminClubDash from "./components/Panels/ADMIN/AdminClubDash";
 import NotAuthorized from "./pages/NotAuthorized"; //for not auhtorization
 import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
 import Profile from "./pages/Profile";
+import Footer from './components/Footer';
 
 export default function App() {
-  return (
+return (
+  <>
     <Routes>
       <Route path="/" element={<AuthPage />} />
 
@@ -47,13 +49,13 @@ export default function App() {
 
       {/* ✅ Add this route for Admin Club Dashboard */}
       <Route
-  path="/admin/clubs/:clubId"
-  element={
-    <RoleProtectedRoute allowedRoles={["admin"]}>
-      <AdminClubDash />
-    </RoleProtectedRoute>
-  }
-/>
+        path="/admin/clubs/:clubId"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin"]}>
+            <AdminClubDash />
+          </RoleProtectedRoute>
+        }
+      />
 
       {/* ✅ Fallback for not-authorized */}
       <Route path="/not-authorized" element={<NotAuthorized />} />
@@ -73,9 +75,7 @@ export default function App() {
       />
 
     </Routes>
-
-  
-
-
-  );
+    <Footer/>
+  </>
+);
 }

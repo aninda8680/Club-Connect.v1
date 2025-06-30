@@ -1,6 +1,5 @@
-// src/pages/Dashboard.tsx
-import { signOut } from "firebase/auth";
-import { auth, db } from "../firebase";
+
+import { db } from "../firebase";
 import { useAuth } from "../AuthContext";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
@@ -8,7 +7,6 @@ import AdminPanel from "../components/Panels/ADMIN/AdminPanel";
 import ClubList from "../components/ClubList";
 import LeaderPanel from "../components/Panels/LEADER/LeaderPanel";
 import MemberPanel from "../components/Panels/MEMBER/MemberPanel";
-import LeaderEventsPanel from "../components/Panels/LEADER/LeaderEventsPanel";
 import Navbar from "../components/Navbar";
 
 export default function Dashboard() {

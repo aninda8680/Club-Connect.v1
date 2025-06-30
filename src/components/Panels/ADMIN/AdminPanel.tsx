@@ -20,8 +20,6 @@ import {
   Users,
   Loader2,
   Trash2,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -36,7 +34,7 @@ export default function AdminPanel() {
   const [isCreating, setIsCreating] = useState(false);
   const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [selectedLeaderName, setSelectedLeaderName] = useState<string | null>(null);
-  const [showClubList, setShowClubList] = useState(true);
+  const [showClubList] = useState(true);
   const [deletingClub, setDeletingClub] = useState<string | null>(null);
 
   // Fetch all leaders
@@ -149,7 +147,7 @@ export default function AdminPanel() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Club Management Dashboard
           </h1>
           <p className="text-slate-400 text-lg">Create, manage, and organize your clubs with ease</p>
@@ -157,7 +155,7 @@ export default function AdminPanel() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm font-medium">Total Clubs</p>
@@ -169,7 +167,7 @@ export default function AdminPanel() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm font-medium">Available Leaders</p>
@@ -181,7 +179,7 @@ export default function AdminPanel() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-red-950 via-slate-800 to-slate-900 p-6 backdrop-blur-sm border border-slate-700/50 rounded-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm font-medium">Active Leaders</p>

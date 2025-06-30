@@ -1,15 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
-import { signOut } from "firebase/auth";
-import { Typewriter } from 'react-simple-typewriter';
+import { db } from "../firebase";
 import { FaUserCircle } from "react-icons/fa"; // import profile icon
 
 export default function Navbar() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [role, setRole] = useState("");
 
   useEffect(() => {
@@ -22,10 +19,6 @@ export default function Navbar() {
     fetchRole();
   }, [user]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/");
-  };
 
   return (
     <nav className="max-h-screen max-w-screen bg-0 text-white p-4 flex justify-between items-center">

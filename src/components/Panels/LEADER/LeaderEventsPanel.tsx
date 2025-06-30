@@ -13,10 +13,8 @@ import Navbar from "../../Navbar";
 import {
   Calendar,
   Clock,
-  FileText,
   MapPin,
   Plus,
-  Sparkles,
   XCircle,
   CheckCircle,
 } from "lucide-react";
