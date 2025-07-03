@@ -64,8 +64,9 @@ export default function Profile() {
     );
   }
 
-  const createdAt = user.metadata.creationTime
-    ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
+  const firebaseUser = user as unknown as import("firebase/auth").User;
+  const createdAt = firebaseUser.metadata?.creationTime
+    ? new Date(firebaseUser.metadata.creationTime).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -100,9 +101,9 @@ export default function Profile() {
 
               <img
   src={
-    user.photoURL && user.photoURL !== ""
-      ? user.photoURL
-      : "https://ui-avatars.com/api/?name=" + (user.displayName || "User")
+    firebaseUser.photoURL && firebaseUser.photoURL !== ""
+      ? firebaseUser.photoURL
+      : "https://ui-avatars.com/api/?name=" + (firebaseUser.displayName || "User")
   }
   alt="Profile"
   className="w-24 h-24 rounded-full border-2 border-gray-300"
