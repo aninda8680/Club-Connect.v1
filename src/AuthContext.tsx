@@ -37,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL,
             role,
           });
         } catch (error) {
