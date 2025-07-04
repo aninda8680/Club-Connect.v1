@@ -64,13 +64,13 @@ export default function Profile() {
     );
   }
 
-  const createdAt = user.metadata.creationTime
-    ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    : "N/A";
+  const createdAt = auth.currentUser?.metadata?.creationTime
+  ? new Date(auth.currentUser.metadata.creationTime).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  : "N/A";
 
   const getRoleColor = (role: string) => {
     switch (role?.toLowerCase()) {
