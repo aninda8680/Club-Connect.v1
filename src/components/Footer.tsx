@@ -63,13 +63,13 @@ const Footer = () => {
           {[
             { 
               icon: <Linkedin size={18} />, 
-              href: "https://linkedin.com/in/aninda-debta",
+              href: "https://www.linkedin.com/in/aninda01",
               label: "LinkedIn",
               color: "hover:bg-gray-700"
             },
             { 
               icon: <Github size={18} />, 
-              href: "https://github.com/aninda-debta",
+              href: "https://github.com/aninda8680",
               label: "GitHub", 
               color: "hover:bg-gray-700"
             },
@@ -81,7 +81,7 @@ const Footer = () => {
             },
             { 
               icon: <Mail size={18} />, 
-              href: "mailto:aninda.debta@gmail.com",
+              href: "mailto:anindadebta8680@gmail.com",
               label: "Email",
               color: "hover:bg-gray-700"
             },

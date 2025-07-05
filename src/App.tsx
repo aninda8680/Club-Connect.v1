@@ -10,7 +10,8 @@ import AdminClubDash from "./components/Panels/ADMIN/AdminClubDash";
 import NotAuthorized from "./pages/NotAuthorized"; //for not auhtorization
 import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
 import Profile from "./pages/Profile";
-import Footer from './components/Footer';
+import AdminPanel from "./components/Panels/ADMIN/AdminPanel";
+
 
 export default function App() {
 return (
@@ -26,6 +27,14 @@ return (
           </ProtectedRoute>
         }
       />
+      <Route 
+      path="/AdminClub" element={
+      <ProtectedRoute>
+          <AdminPanel />
+      </ProtectedRoute>
+      }
+      />
+
 
       <Route path="/events" element={<PublicEventList />} />
 
@@ -75,7 +84,7 @@ return (
       />
 
     </Routes>
-    <Footer/>
+    
   </>
 );
 }

@@ -19,6 +19,7 @@ import {
   Clock,
 } from "lucide-react";
 import Navbar from "../../Navbar";
+import Footer from "../../Footer";
 
 interface Proposal {
   id: string;
@@ -202,16 +203,17 @@ export default function AdminEvents() {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <Navbar/>
-      <div className="max-w-7xl mx-auto">
+      <div className="py-20">
+        <div className="max-w-7xl mx-auto lg:p-8 space-y-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-purple-500/20 rounded-lg">
               <Sparkles className="w-8 h-8 text-purple-400" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl py-5 font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               Event Management Dashboard
             </h1>
           </div>
@@ -341,6 +343,8 @@ export default function AdminEvents() {
           )}
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

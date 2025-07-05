@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
+import Navbar from "../../Navbar";
+import Footer from "../../Footer";
 
 
 export default function AdminPanel() {
@@ -127,7 +129,9 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="max-h-screen bg gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div>
+    <div className="min-h-screen w-screen py-20 px-5 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      <Navbar/>
       {/* Notification Toast */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
@@ -147,10 +151,10 @@ export default function AdminPanel() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl py-1.5 font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Club Management Dashboard
           </h1>
-          <p className="text-slate-400 text-lg">Create, manage, and organize your clubs with ease</p>
+          <p className="text-slate-400 py-5 text-lg">Create, manage, and organize your clubs with ease</p>
         </div>
 
         {/* Stats Overview */}
@@ -369,6 +373,9 @@ export default function AdminPanel() {
           </div>
         </div>
       </div>
+    
+    </div>
+    <Footer />
     </div>
   );
 }

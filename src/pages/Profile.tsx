@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebase";
 import { useAuth } from "../AuthContext";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -86,11 +87,9 @@ export default function Profile() {
   };
 
   return (
-        <div className="min-h-screen w-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 p-4 md:p-8">
-
-    <div className="">
-      <Navbar/>
-      <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+              <Navbar />
+      <div className="max-w-3xl py-30 mx-auto">
         {/* Header with animated gradient */}
         <div className="relative mb-8 p-8 bg-white/80 dark:bg-zinc-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-zinc-700/30 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-indigo-600/10 dark:from-blue-400/5 dark:via-purple-400/5 dark:to-indigo-400/5"></div>
@@ -99,14 +98,14 @@ export default function Profile() {
             <div className="relative group">
 
               <img
-  src={
-    user.photoURL && user.photoURL !== ""
-      ? user.photoURL
-      : "https://ui-avatars.com/api/?name=" + (user.displayName || "User")
-  }
-  alt="Profile"
-  className="w-24 h-24 rounded-full border-2 border-gray-300"
-/>
+                src={
+                  user.photoURL && user.photoURL !== ""
+                    ? user.photoURL
+                    : "https://ui-avatars.com/api/?name=" + (user.displayName || "User")
+                }
+                alt="Profile"
+                className="w-24 h-24 rounded-full border-2 border-gray-300"
+              />
               <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-zinc-800 animate-pulse"></div>
             </div>
 
@@ -208,7 +207,8 @@ export default function Profile() {
           </button>
         </div>
       </div>
+    <Footer/>
     </div>
-    </div>
+    
   );
 }
