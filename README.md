@@ -18,7 +18,8 @@ A chill club management site for colleges 🏫 — built so admins, leaders, and
 - React + TypeScript ⚛️  
 - Firebase (Auth + Firestore) 🔥  
 - Tailwind CSS 🎨  
-- Lucide Icons cuz aesthetic matters 😎  
+- Lucide Icons cuz aesthetic matters 😎
+- Many more Components
 
 ---
 
