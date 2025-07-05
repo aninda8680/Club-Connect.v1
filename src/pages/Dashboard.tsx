@@ -126,7 +126,7 @@ export default function Dashboard() {
       case "admin":
         return [
           { icon: Building2, label: "Manage Clubs", description: "Create and oversee all clubs", color: "from-blue-500 to-blue-600", href: "/AdminClub" },
-          { icon: Calendar, label: "Review Events", description: "Approve and manage events", color: "from-purple-500 to-purple-600", href: "/AdminEvents" },
+          { icon: Calendar, label: "Review Events", description: "Manage events", color: "from-purple-500 to-purple-600", href: "/AdminEvents" },
           { icon: BarChart3, label: "Analytics", description: "View platform insights", color: "from-green-500 to-green-600", href: "#" },
           { icon: Settings, label: "Settings", description: "Configure system settings", color: "from-gray-500 to-gray-600", href: "#" },
         ];
