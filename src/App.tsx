@@ -3,7 +3,7 @@ import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
-import PublicEventList from "./components/Panels/PublicEventList";
+import PublicEventList from "./components/Panels/PUBLIC/PublicEventList";
 import LeaderEventsPanel from "./components/Panels/LEADER/LeaderEventsPanel";
 import LeaderMember from "./components/Panels/LEADER/LeaderMember";
 import AdminClubDash from "./components/Panels/ADMIN/AdminClubDash";
@@ -35,7 +35,7 @@ return (
       }
       />
 
-
+] 
       <Route path="/events" element={<PublicEventList />} />
 
       <Route

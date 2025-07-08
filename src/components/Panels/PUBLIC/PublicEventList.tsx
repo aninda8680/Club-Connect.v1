@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { Calendar, MapPin, Users, Clock, Sparkles, ArrowRight } from "lucide-react"; // <-- Added ArrowRight
-import Navbar from "../Navbar";
+import Navbar from "../../Navbar";
 
 
 // Optional: Map icon names to components if your events have an 'icon' field as a string

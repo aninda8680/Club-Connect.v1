@@ -10,6 +10,7 @@ import AdminPanel from "../components/Panels/ADMIN/AdminPanel";
 import LeaderPanel from "../components/Panels/LEADER/LeaderPanel";
 import MemberPanel from "../components/Panels/MEMBER/MemberPanel";
 import ClubList from "../components/ClubList";
+import PublicPanel from "../components/Panels/PUBLIC/PublicPanel";
 
 import {
   Activity, Award, BarChart3, Bell, BookOpen, Building2, Calendar, ChevronRight,
@@ -161,117 +162,13 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <Navbar />
-      <div className="py-20">
-        <div className="max-w-7xl mx-auto lg:p-8 space-y-8">
-
-          {/* Header */}
-          <div className="relative overflow-hidden y-30 bg-gradient-to-r from-slate-800/60 to-slate-900/60 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-slate-700/30">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10"></div>
-            <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-10">
-              <div className="flex items-center gap-4">
-                <div className={`p-4 bg-gradient-to-r ${getRoleColor(role)} rounded-2xl shadow-2xl`}>
-                  {getRoleIcon(role)}
-                </div>
-                <div className="py-15">
-                  <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                    Welcome back, {user?.displayName || "User"}!
-                  </h1>
-                  <p className="text-slate-400 text-lg mt-1">{getRoleTitle(role)}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: Building2, label: "Total Clubs", value: stats.totalClubs, color: "from-blue-500 to-cyan-500", bgColor: "bg-blue-500/20" },
-              { icon: Calendar, label: "Total Events", value: stats.totalEvents, color: "from-purple-500 to-pink-500", bgColor: "bg-purple-500/20" },
-              { icon: Users, label: "Total Members", value: stats.totalMembers, color: "from-green-500 to-emerald-500", bgColor: "bg-green-500/20" },
-              { icon: TrendingUp, label: "Active Events", value: stats.activeEvents, color: "from-orange-500 to-red-500", bgColor: "bg-orange-500/20" },
-            ].map((stat, index) => (
-              <div key={index} className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:bg-slate-800/70 transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 ${stat.bgColor} rounded-xl`}>
-                    <stat.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-slate-400 text-sm">{stat.label}</p>
-                  </div>
-                </div>
-                <div className={`h-1 bg-gradient-to-r ${stat.color} rounded-full opacity-60 group-hover:opacity-100 transition-opacity`} />
-              </div>
-            ))}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold">Quick Actions</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {getQuickActions(role).map((action, index) => (
-                <button
-                  key={index}
-                  onClick={() => action.href !== "#" && navigate(action.href)}
-                  className="group flex items-center gap-4 p-4 bg-slate-700/50 hover:bg-slate-600/50 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                >
-                  <div className={`p-3 ${action.color} rounded-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <action.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-semibold text-white group-hover:text-blue-300 transition-colors duration-300">
-                      {action.label}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Panels */}
+      {/* Panels */}
           {role === "leader" && <LeaderPanel />}
           {role === "member" && <MemberPanel />}
-          {(role === "visitor" || !role) && <ClubList />}
+          {(role === "visitor" || !role) && <PublicPanel />}
 
-          {/* Recent Activity */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold">Recent Activity</h2>
-              </div>
-              <button className="text-blue-400 hover:text-blue-300 font-medium">View All</button>
-            </div>
-            <div className="space-y-4">
-              {[
-                { icon: UserCheck, text: "New member joined Tech Club", time: "2 hours ago", color: "text-green-400" },
-                { icon: Calendar, text: "Event 'AI Workshop' was approved", time: "4 hours ago", color: "text-blue-400" },
-                { icon: Star, text: "Your club received a 5-star rating", time: "1 day ago", color: "text-yellow-400" },
-                { icon: MessageSquare, text: "New announcement posted", time: "2 days ago", color: "text-purple-400" },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center gap-4 p-4 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 transition">
-                  <div className="p-2 bg-slate-600/50 rounded-lg">
-                    <activity.icon className={`w-5 h-5 ${activity.color}`} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white font-medium">{activity.text}</p>
-                    <p className="text-slate-400 text-sm">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </div>
+        
+      
       <Footer />
     </div>
   );

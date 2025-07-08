@@ -97,7 +97,8 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      <nav className="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-md border-b border-gray-800/50 text-white px-6 py-4 flex justify-between items-center shadow-2xl z-50">
+      <nav className="top-0 left-0 w-full backdrop-blur-md bg-transparent/30 text-white px-6 py-4 flex justify-between items-center shadow-2xl z-50">
+
         {/* Logo Section */}
         <Link to="/" className="flex items-center space-x-3 group">
           <motion.div

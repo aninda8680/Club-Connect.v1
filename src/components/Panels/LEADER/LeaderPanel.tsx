@@ -22,7 +22,7 @@ export default function LeaderPanel() {
   }, [user]);
 
   return (
-    <div className=" max-h-screen w-screen mt-6 bg-gray-800 p-6 rounded-lg text-white">
+    <div className=" max-h-screen mt-6 bg-gray-800 p-6 rounded-lg text-white">
       <h2 className="text-2xl font-bold mb-4">🏠 Leader Dashboard</h2>
       {clubName ? (
         <p className="text-lg">
