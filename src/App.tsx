@@ -7,84 +7,71 @@ import PublicEventList from "./components/Panels/PUBLIC/PublicEventList";
 import LeaderEventsPanel from "./components/Panels/LEADER/LeaderEventsPanel";
 import LeaderMember from "./components/Panels/LEADER/LeaderMember";
 import AdminClubDash from "./components/Panels/ADMIN/AdminClubDash";
-import NotAuthorized from "./pages/NotAuthorized"; //for not auhtorization
+import NotAuthorized from "./pages/NotAuthorized";
 import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
 import Profile from "./pages/Profile";
-import AdminPanel from "./components/Panels/ADMIN/AdminPanel";
-
+import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 
 export default function App() {
-return (
-  <>
-    <Routes>
-      <Route path="/" element={<AuthPage />} />
-
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-      path="/AdminClub" element={
-      <ProtectedRoute>
-          <AdminPanel />
-      </ProtectedRoute>
-      }
-      />
-
-] 
-      <Route path="/events" element={<PublicEventList />} />
-
-      <Route
-        path="/LeaderEvents"
-        element={
-          <ProtectedRoute>
-            <LeaderEventsPanel />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/manage"
-        element={
-          <ProtectedRoute>
-            <LeaderMember />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* ✅ Add this route for Admin Club Dashboard */}
-      <Route
-        path="/admin/clubs/:clubId"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin"]}>
-            <AdminClubDash />
-          </RoleProtectedRoute>
-        }
-      />
-
-      {/* ✅ Fallback for not-authorized */}
-      <Route path="/not-authorized" element={<NotAuthorized />} />
-
-      {/* Optional: catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-      <Route path="/Profile" element={<Profile />} />
-
-      <Route
-        path="/AdminEvents"
-        element={
-          <ProtectedRoute>
-            <AdminEventPage />
-          </ProtectedRoute>
-        }
-      />
-
-    </Routes>
-    
-  </>
-);
+  return (
+    <div>
+      <main>
+        <Routes>
+          <Route path="/" element={<AuthPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/AdminClub" 
+            element={
+              <ProtectedRoute>
+                <AdminClub />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/events" element={<PublicEventList />} />
+          <Route
+            path="/LeaderEvents"
+            element={
+              <ProtectedRoute>
+                <LeaderEventsPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manage"
+            element={
+              <ProtectedRoute>
+                <LeaderMember />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/clubs/:clubId"
+            element={
+              <RoleProtectedRoute allowedRoles={["admin"]}>
+                <AdminClubDash />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route path="/not-authorized" element={<NotAuthorized />} />
+          <Route path="/Profile" element={<Profile />} />
+          <Route
+            path="/AdminEvents"
+            element={
+              <ProtectedRoute>
+                <AdminEventPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }
