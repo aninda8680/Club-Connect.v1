@@ -8,7 +8,7 @@ import { useAuth } from "../AuthContext";
 import AdminPanel from "../components/Panels/ADMIN/AdminPanel";
 import LeaderPanel from "../components/Panels/LEADER/LeaderPanel";
 import MemberPanel from "../components/Panels/MEMBER/MemberPanel";
-//import PublicPanel from "../components/Panels/PUBLIC/PublicPanel";
+import PublicPanel from "../components/Panels/PUBLIC/PublicPanel";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -51,11 +51,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-black text-white">
+    <>
       {role === "admin" && <AdminPanel />}
       {role === "leader" && <LeaderPanel />}
       {role === "member" && <MemberPanel />}
+      {role === "visitor" && <PublicPanel />}
 
-    </div>
+    </>
   );
 }
