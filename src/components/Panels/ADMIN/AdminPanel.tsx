@@ -1,12 +1,13 @@
+// AdminPanel.tsx
 import React, { useState, useEffect } from 'react';
-import { 
-  FiUsers, 
-  FiCalendar, 
-  FiShield, 
-  FiPlus, 
-  FiCheck, 
-  FiX, 
-  FiEye, 
+import {
+  FiUsers,
+  FiCalendar,
+  FiShield,
+  FiPlus,
+  FiCheck,
+  FiX,
+  FiEye,
   FiSettings,
   FiBell,
   FiSearch,
@@ -14,29 +15,33 @@ import {
   FiClock,
   FiAlertCircle
 } from 'react-icons/fi';
-import { 
-  Building2, 
-  Crown, 
-  Sparkles, 
-  CheckCircle, 
+import {
+  Building2,
+  Crown,
+  Sparkles,
+  CheckCircle,
   XCircle,
   AlertTriangle,
   TrendingUp,
-  Users as LucideUsers
+  Users as LucideUsers,
+  Code,
+  Terminal,
+  Cpu,
+  Database,
+  Server
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where, 
-  collectionGroup,
-  orderBy,
-  limit 
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  collectionGroup
 } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import Navbar from '../../Navbar';
 import Footer from '../../Footer';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardStats {
   totalClubs: number;
@@ -54,27 +59,17 @@ interface EventProposal {
   status: 'pending' | 'approved' | 'rejected';
   submittedBy: string;
   timestamp: any;
-  [key: string]: any; // For any additional properties
+  [key: string]: any;
 }
 
 interface Club {
   id: string;
   leaderId: string;
   name: string;
-  [key: string]: any; // For any additional properties
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'club_created' | 'event_proposed' | 'event_approved' | 'member_joined';
-  title: string;
-  description: string;
-  timestamp: any;
-  clubName?: string;
+  [key: string]: any;
 }
 
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState<DashboardStats>({
     totalClubs: 0,
     totalLeaders: 0,
@@ -83,34 +78,32 @@ const AdminPanel = () => {
     approvedEvents: 0,
     activeLeaders: 0
   });
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pendingProposals, setPendingProposals] = useState<EventProposal[]>([]);
 
-  // Fetch dashboard statistics
+  const [pendingProposals, setPendingProposals] = useState<EventProposal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isHovering, setIsHovering] = useState<string | null>(null);
+
   const fetchStats = async () => {
     try {
       setLoading(true);
 
-      // Get all clubs
+      // Simulate loading delay for animations
+      await new Promise(resolve => setTimeout(resolve, 800));
+
       const clubsSnap = await getDocs(collection(db, 'clubs'));
       const clubs = clubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Club));
 
-      // Get all users with different roles
       const leadersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'leader')));
       const membersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'member')));
 
-      // Get pending proposals
       const proposalsSnap = await getDocs(collectionGroup(db, 'eventProposals'));
       const pendingProps = proposalsSnap.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as EventProposal))
         .filter(prop => prop.status === 'pending');
 
-      // Get approved events
       const eventsSnap = await getDocs(collectionGroup(db, 'events'));
       const approvedEvs = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Calculate active leaders (leaders who have clubs)
       const activeLeaderIds = new Set(clubs.map(club => club.leaderId));
 
       setStats({
@@ -122,8 +115,7 @@ const AdminPanel = () => {
         activeLeaders: activeLeaderIds.size
       });
 
-      setPendingProposals(pendingProps.slice(0, 5)); // Get first 5 for quick view
-
+      setPendingProposals(pendingProps.slice(0, 5));
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -136,247 +128,367 @@ const AdminPanel = () => {
   }, []);
 
   const statsCards = [
-    { 
-      title: 'Total Clubs', 
-      value: stats.totalClubs, 
-      icon: Building2, 
-      change: '+3', 
+    {
+      title: 'Total Clubs',
+      value: stats.totalClubs,
+      icon: Terminal,
+      change: '+3',
       color: 'blue',
       link: '/AdminClub'
     },
-    { 
-      title: 'Pending Events', 
-      value: stats.pendingProposals, 
-      icon: FiClock, 
-      change: '+2', 
+    {
+      title: 'Pending Events',
+      value: stats.pendingProposals,
+      icon: Cpu,
+      change: '+2',
       color: 'yellow',
       link: '/AdminEvents'
     },
-    { 
-      title: 'Active Leaders', 
-      value: stats.activeLeaders, 
-      icon: Crown, 
-      change: '0', 
+    {
+      title: 'Active Leaders',
+      value: stats.activeLeaders,
+      icon: Code,
+      change: '0',
       color: 'purple',
       link: '/AdminClub'
     },
-    { 
-      title: 'Total Members', 
-      value: stats.totalMembers, 
-      icon: LucideUsers, 
-      change: '+12', 
+    {
+      title: 'Total Members',
+      value: stats.totalMembers,
+      icon: Database,
+      change: '+12',
       color: 'green',
       link: '/dashboard'
-    },
+    }
   ];
 
   const getColorClasses = (color: string) => {
     const colors = {
-      blue: 'from-blue-600/20 to-blue-500/20 border-blue-500/30',
-      yellow: 'from-yellow-600/20 to-yellow-500/20 border-yellow-500/30',
-      purple: 'from-purple-600/20 to-purple-500/20 border-purple-500/30',
-      green: 'from-green-600/20 to-green-500/20 border-green-500/30'
+      blue: 'from-blue-900/70 to-blue-800/70 border-blue-700/50 hover:border-blue-500/70',
+      yellow: 'from-amber-900/70 to-amber-800/70 border-amber-700/50 hover:border-amber-500/70',
+      purple: 'from-purple-900/70 to-purple-800/70 border-purple-700/50 hover:border-purple-500/70',
+      green: 'from-emerald-900/70 to-emerald-800/70 border-emerald-700/50 hover:border-emerald-500/70'
     };
     return colors[color as keyof typeof colors] || colors.blue;
   };
 
   const getIconColor = (color: string) => {
     const colors = {
-      blue: 'text-blue-400',
-      yellow: 'text-yellow-400',
-      purple: 'text-purple-400',
-      green: 'text-green-400'
+      blue: 'text-blue-400 group-hover:text-blue-300',
+      yellow: 'text-amber-400 group-hover:text-amber-300',
+      purple: 'text-purple-400 group-hover:text-purple-300',
+      green: 'text-emerald-400 group-hover:text-emerald-300'
     };
     return colors[color as keyof typeof colors] || colors.blue;
   };
 
+  const getStatusColor = (status: string) => {
+    const colors = {
+      pending: 'bg-amber-900/30 text-amber-400 border-amber-700/50',
+      approved: 'bg-emerald-900/30 text-emerald-400 border-emerald-700/50',
+      rejected: 'bg-rose-900/30 text-rose-400 border-rose-700/50'
+    };
+    return colors[status as keyof typeof colors] || colors.pending;
+  };
+
+  const loadingSkeleton = Array(4).fill(0).map((_, i) => (
+    <motion.div
+      key={i}
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: 0.8 }}
+      transition={{ repeat: Infinity, repeatType: "reverse", duration: 1.5 }}
+      className="h-32 bg-slate-800/50 rounded-xl border border-slate-700/50"
+    />
+  ));
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
       <Navbar />
 
-      {/* Main Content */}
-      <main className="pt-20 pb-8 px-4 sm:px-6 lg:px-8 w-full max-w-none overflow-x-hidden">
+      <main className="pt-30 pr-20 pb-8 px-4 sm:px-6 lg:px-50 w-full max-w-none">
         <div className="w-full">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-xl border border-blue-500/30">
-                <FiShield className="w-8 h-8 text-blue-400" />
-              </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex flex-wrap items-center gap-10 mb-4">
+              <motion.div 
+                whileHover={{ rotate: 5 }}
+                className="p-3 bg-gradient-to-br from-blue-900/70 to-purple-900/70 rounded-xl border border-blue-700/50"
+              >
+                <Terminal className="w-8 h-8 text-blue-400" />
+              </motion.div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Admin Dashboard
+                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Admin Console
                 </h1>
-                <p className="text-slate-400 text-lg">Manage your club ecosystem with powerful admin tools</p>
+                <p className="text-slate-400 text-sm md:text-lg">
+                  <span className="text-green-400">$</span> Manage your digital ecosystem
+                </p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {statsCards.map((stat, index) => (
-              <Link 
-                key={index} 
-                to={stat.link}
-                className="block group"
-              >
-                <div className={`bg-gradient-to-br ${getColorClasses(stat.color)} backdrop-blur-sm border rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-400 text-sm font-medium">{stat.title}</p>
-                      <p className="text-3xl font-bold mt-1">
-                        {loading ? '...' : stat.value}
-                      </p>
-                      <p className="text-green-400 text-sm mt-1">{stat.change} this week</p>
-                    </div>
-                    <div className={`p-3 bg-slate-800/50 rounded-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <stat.icon className={`w-8 h-8 ${getIconColor(stat.color)}`} />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          
 
-          {/* Quick Actions */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 mb-8">
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-purple-400" />
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Link 
-                to="/AdminClub"
-                className="flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
-              >
-                <FiPlus className="w-5 h-5" />
-                <span className="font-semibold">Create New Club</span>
-              </Link>
-              <Link 
-                to="/AdminEvents"
-                className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/25"
-              >
-                <FiCheck className="w-5 h-5" />
-                <span className="font-semibold">Review Events</span>
-              </Link>
-              <Link 
-                to="/AdminClub"
-                className="flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25"
-              >
-                <FiUsers className="w-5 h-5" />
-                <span className="font-semibold">Manage Leaders</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Pending Event Proposals */}
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
-              <div className="p-6 border-b border-slate-700/50">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                    Pending Event Proposals
+                    {/* Quick Actions */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="bg-slate-900/70 backdrop-blur-sm border border-slate-800 rounded-xl p-6 mb-8"
+          >
+            <div className="flex flex-col space-y-6">
+              {/* Header */}
+              <div className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-3">
+                  <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                  <h3 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Quick Commands
                   </h3>
-                  <Link 
-                    to="/AdminEvents"
-                    className="text-blue-400 hover:text-blue-300 text-sm font-medium"
-                  >
-                    View All
-                  </Link>
                 </div>
+                <p className="text-sm text-slate-400 pl-8">Execute common administrative tasks</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Create Club */}
+                <motion.div whileHover={{ y: -2 }}>
+                  <Link 
+                    to="/AdminClub" 
+                    className="flex flex-col items-start p-4 space-y-2 bg-gradient-to-br from-blue-900/50 to-blue-900/30 hover:from-blue-800/50 hover:to-blue-800/30 rounded-lg border border-blue-800/30 hover:border-blue-600/50 transition-all duration-200 h-full"
+                  >
+                    <div className="p-2 bg-blue-900/50 rounded-lg border border-blue-800/50">
+                      <FiPlus className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <h4 className="font-medium text-white">Create Club</h4>
+                    <p className="text-xs text-slate-400">Initialize new club instance</p>
+                    <div className="mt-2 text-xs font-mono text-blue-300 bg-blue-900/30 px-2 py-1 rounded">
+                      $ admin create --club
+                    </div>
+                  </Link>
+                </motion.div>
+
+                {/* Review Events */}
+                <motion.div whileHover={{ y: -2 }}>
+                  <Link 
+                    to="/AdminEvents" 
+                    className="flex flex-col items-start p-4 space-y-2 bg-gradient-to-br from-emerald-900/50 to-emerald-900/30 hover:from-emerald-800/50 hover:to-emerald-800/30 rounded-lg border border-emerald-800/30 hover:border-emerald-600/50 transition-all duration-200 h-full"
+                  >
+                    <div className="p-2 bg-emerald-900/50 rounded-lg border border-emerald-800/50">
+                      <FiCheck className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <h4 className="font-medium text-white">Review Events</h4>
+                    <p className="text-xs text-slate-400">Approve pending submissions</p>
+                    <div className="mt-2 text-xs font-mono text-emerald-300 bg-emerald-900/30 px-2 py-1 rounded">
+                      $ admin review --events
+                    </div>
+                  </Link>
+                </motion.div>
+
+                {/* Manage Leaders */}
+                <motion.div whileHover={{ y: -2 }}>
+                  <Link 
+                    to="/AdminClub" 
+                    className="flex flex-col items-start p-4 space-y-2 bg-gradient-to-br from-purple-900/50 to-purple-900/30 hover:from-purple-800/50 hover:to-purple-800/30 rounded-lg border border-purple-800/30 hover:border-purple-600/50 transition-all duration-200 h-full"
+                  >
+                    <div className="p-2 bg-purple-900/50 rounded-lg border border-purple-800/50">
+                      <FiUsers className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <h4 className="font-medium text-white">Manage Leaders</h4>
+                    <p className="text-xs text-slate-400">Configure leadership roles</p>
+                    <div className="mt-2 text-xs font-mono text-purple-300 bg-purple-900/30 px-2 py-1 rounded">
+                      $ admin config --leaders
+                    </div>
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Pending Proposals */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="bg-slate-900/70 backdrop-blur-sm border border-slate-800 rounded-xl overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-800 flex justify-between items-center">
+                <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-400" />
+                  <span className="bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
+                    Pending Proposals
+                  </span>
+                </h3>
+                <Link to="/AdminEvents" className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center">
+                  <span>view all</span>
+                  <span className="ml-1">→</span>
+                </Link>
               </div>
               <div className="p-6">
                 {loading ? (
-                  <div className="text-center py-8 text-slate-400">
-                    <div className="animate-pulse">Loading...</div>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 0.8 }}
+                        transition={{ repeat: Infinity, repeatType: "reverse", duration: 1.5 }}
+                        className="h-20 bg-slate-800/50 rounded-lg border border-slate-700/50"
+                      />
+                    ))}
                   </div>
                 ) : pendingProposals.length === 0 ? (
-                  <div className="text-center py-8">
-                    <FiClock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400">No pending proposals</p>
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-8"
+                  >
+                    <FiClock className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+                    <p className="text-slate-500">No pending proposals</p>
+                    <p className="text-slate-600 text-sm mt-1">All clear!</p>
+                  </motion.div>
                 ) : (
                   <div className="space-y-4">
-                    {pendingProposals.slice(0, 3).map((proposal) => (
-                      <div key={proposal.id} className="p-4 bg-slate-700/50 rounded-lg border border-slate-600/50">
-                        <h4 className="font-semibold text-white mb-1">{proposal.title}</h4>
-                        <p className="text-slate-400 text-sm mb-2 line-clamp-2">{proposal.description}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-500">By {proposal.submittedBy}</span>
-                          <div className="flex gap-2">
-                            <button className="p-1 bg-green-600/20 hover:bg-green-600/30 rounded text-green-400 transition-colors">
-                              <FiCheck className="w-4 h-4" />
-                            </button>
-                            <button className="p-1 bg-red-600/20 hover:bg-red-600/30 rounded text-red-400 transition-colors">
-                              <FiX className="w-4 h-4" />
-                            </button>
+                    <AnimatePresence>
+                      {pendingProposals.map((proposal, index) => (
+                        <motion.div
+                          key={proposal.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          exit={{ opacity: 0 }}
+                          whileHover={{ scale: 1.02 }}
+                          className="p-4 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-slate-600/70 transition-all cursor-pointer"
+                        >
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-semibold text-white mb-1">{proposal.title}</h4>
+                            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(proposal.status)}`}>
+                              {proposal.status}
+                            </span>
                           </div>
-                        </div>
-                      </div>
-                    ))}
+                          <p className="text-slate-400 text-sm mb-2 line-clamp-2">{proposal.description}</p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-500">@{proposal.submittedBy}</span>
+                            <div className="flex gap-2">
+                              <motion.button 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-1 sm:p-2 bg-emerald-900/30 hover:bg-emerald-800/50 rounded text-emerald-400 transition-colors border border-emerald-800/50"
+                              >
+                                <FiCheck className="w-4 h-4" />
+                              </motion.button>
+                              <motion.button 
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-1 sm:p-2 bg-rose-900/30 hover:bg-rose-800/50 rounded text-rose-400 transition-colors border border-rose-800/50"
+                              >
+                                <FiX className="w-4 h-4" />
+                              </motion.button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
 
             {/* System Health */}
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
-              <div className="p-6 border-b border-slate-700/50">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="bg-slate-900/70 backdrop-blur-sm border border-slate-800 rounded-xl overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-800">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-400" />
-                  System Overview
+                  <Server className="w-5 h-5 text-emerald-400" />
+                  <span className="bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
+                    System Status
+                  </span>
                 </h3>
               </div>
               <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-lg">
+                <motion.div 
+                  whileHover={{ scale: 1.01 }}
+                  className="flex items-center justify-between p-3 bg-emerald-900/10 border border-emerald-800/30 rounded-lg"
+                >
                   <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-green-400 font-medium">All Systems Operational</span>
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    <span className="text-emerald-400 font-medium">All Systems Operational</span>
                   </div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Active Clubs</span>
-                    <span className="text-white font-semibold">{stats.totalClubs}</span>
+                  <div className="flex items-center">
+                    <span className="text-xs text-emerald-400 mr-2">100%</span>
+                    <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Leaders Assigned</span>
-                    <span className="text-white font-semibold">{stats.activeLeaders}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Pending Reviews</span>
-                    <span className="text-yellow-400 font-semibold">{stats.pendingProposals}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Total Events</span>
-                    <span className="text-white font-semibold">{stats.approvedEvents}</span>
-                  </div>
+                </motion.div>
+                <div className="space-y-3 text-sm sm:text-base">
+                  {[
+                    { label: 'Active Clubs', value: stats.totalClubs, icon: <Terminal className="w-4 h-4 text-blue-400" /> },
+                    { label: 'Leaders Assigned', value: stats.activeLeaders, icon: <Code className="w-4 h-4 text-purple-400" /> },
+                    { label: 'Pending Reviews', value: stats.pendingProposals, icon: <Cpu className="w-4 h-4 text-amber-400" /> },
+                    { label: 'Total Events', value: stats.approvedEvents, icon: <Database className="w-4 h-4 text-emerald-400" /> }
+                  ].map((item, index) => (
+                    <motion.div
+                      key={index}
+                      whileHover={{ x: 5 }}
+                      className="flex justify-between items-center p-2 hover:bg-slate-800/30 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center gap-2 text-slate-400">
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </div>
+                      <span className="font-semibold font-mono">{item.value}</span>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Recent Activity Feed */}
-          <div className="mt-8">
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
-              <div className="p-6 border-b border-slate-700/50">
+          {/* Recent Activity Placeholder */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+            className="mt-8"
+          >
+            <div className="bg-slate-900/70 backdrop-blur-sm border border-slate-800 rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-slate-800">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <FiBell className="w-5 h-5 text-blue-400" />
-                  Recent Activity
+                  <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                    Activity Log
+                  </span>
                 </h3>
               </div>
-              <div className="p-6">
-                <div className="text-center py-8">
-                  <FiBell className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400">Activity feed coming soon</p>
-                  <p className="text-slate-500 text-sm">Track all system activities in real-time</p>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="p-6 text-center py-8"
+              >
+                <div className="inline-block p-4 bg-slate-800/50 rounded-full border border-slate-700/50 mb-4">
+                  <FiBell className="w-8 h-8 text-slate-600" />
                 </div>
-              </div>
+                <p className="text-slate-400">Activity feed coming in v2.0</p>
+                <p className="text-slate-600 text-sm mt-1">Track all system activities in real-time</p>
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className="mt-4 inline-block px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-slate-400"
+                >
+                  View changelog
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </main>
 
