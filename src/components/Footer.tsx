@@ -1,11 +1,10 @@
-
 import { Github, Linkedin, Instagram, Mail, Code, MapPin } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white px-6 py-8 text-sm relative overflow-hidden">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-5">
+    <footer className="w-full overflow-x-hidden bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white px-6 py-8 text-sm relative">
+      {/* Subtle background pattern (safe version) */}
+      <div className="absolute inset-0 opacity-5 overflow-hidden max-w-screen">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-600/20"></div>
         <div className="absolute top-4 left-4 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
         <div className="absolute top-8 right-8 w-1 h-1 bg-purple-400 rounded-full animate-pulse delay-1000"></div>
@@ -61,29 +60,29 @@ const Footer = () => {
         {/* Right Side: Social Handles */}
         <div className="flex gap-3">
           {[
-            { 
-              icon: <Linkedin size={18} />, 
+            {
+              icon: <Linkedin size={18} />,
               href: "https://www.linkedin.com/in/aninda01",
               label: "LinkedIn",
-              color: "hover:bg-gray-700"
+              color: "hover:bg-gray-700",
             },
-            { 
-              icon: <Github size={18} />, 
+            {
+              icon: <Github size={18} />,
               href: "https://github.com/aninda8680",
-              label: "GitHub", 
-              color: "hover:bg-gray-700"
+              label: "GitHub",
+              color: "hover:bg-gray-700",
             },
-            { 
-              icon: <Instagram size={18} />, 
+            {
+              icon: <Instagram size={18} />,
               href: "https://instagram.com/aninda_debta",
               label: "Instagram",
-              color: "hover:bg-gray-700"
+              color: "hover:bg-gray-700",
             },
-            { 
-              icon: <Mail size={18} />, 
+            {
+              icon: <Mail size={18} />,
               href: "mailto:anindadebta8680@gmail.com",
               label: "Email",
-              color: "hover:bg-gray-700"
+              color: "hover:bg-gray-700",
             },
           ].map((item, idx) => (
             <a
@@ -97,7 +96,7 @@ const Footer = () => {
             >
               {item.icon}
               {/* Tooltip */}
-              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg- text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
                 {item.label}
               </span>
             </a>
@@ -105,7 +104,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Professional Footer Text */}
+      {/* Footer Text */}
       <div className="text-center mt-6 pt-4 border-t border-gray-800/50">
         <div className="text-gray-400 text-xs space-y-1">
           <p>© 2025 Aninda Debta • All rights reserved</p>
@@ -113,33 +112,26 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Enhanced Animations */}
+      {/* Animations */}
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-4px) rotate(1deg); }
         }
-        
+
         @keyframes glow {
           0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
           50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(147, 51, 234, 0.3); }
         }
 
-        .animate-float { 
-          animation: float 4s ease-in-out infinite; 
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
         }
-        
+
         .animate-glow {
           animation: glow 3s ease-in-out infinite;
         }
 
-        /* Staggered animation delays */
-        a:nth-child(1) { animation-delay: 0s; }
-        a:nth-child(2) { animation-delay: 0.1s; }
-        a:nth-child(3) { animation-delay: 0.2s; }
-        a:nth-child(4) { animation-delay: 0.3s; }
-        
-        /* Hover effects */
         a:hover {
           transform: translateY(-2px) scale(1.05);
           box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);

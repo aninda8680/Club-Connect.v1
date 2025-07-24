@@ -1,200 +1,388 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../../Navbar";
-import Footer from "../../Footer";
+import React, { useState, useEffect } from 'react';
 import { 
-  Users, 
-  Calendar, 
-  Settings, 
-  Shield, 
-  BarChart2,
-  AlertCircle,
-  UserCheck,
-  BookOpen,
-  ChevronRight
-} from "lucide-react";
+  FiUsers, 
+  FiCalendar, 
+  FiShield, 
+  FiPlus, 
+  FiCheck, 
+  FiX, 
+  FiEye, 
+  FiSettings,
+  FiBell,
+  FiSearch,
+  FiTrendingUp,
+  FiClock,
+  FiAlertCircle
+} from 'react-icons/fi';
+import { 
+  Building2, 
+  Crown, 
+  Sparkles, 
+  CheckCircle, 
+  XCircle,
+  AlertTriangle,
+  TrendingUp,
+  Users as LucideUsers
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { 
+  collection, 
+  getDocs, 
+  query, 
+  where, 
+  collectionGroup,
+  orderBy,
+  limit 
+} from 'firebase/firestore';
+import { db } from '../../../firebase';
+import Navbar from '../../Navbar';
+import Footer from '../../Footer';
 
-export default function AdminPanel() {
-  const navigate = useNavigate();
+interface DashboardStats {
+  totalClubs: number;
+  totalLeaders: number;
+  totalMembers: number;
+  pendingProposals: number;
+  approvedEvents: number;
+  activeLeaders: number;
+}
 
-  const adminCards = [
-    {
-      title: "Club Management",
-      description: "Create, edit, and oversee all clubs",
-      icon: <Shield className="w-8 h-8 text-amber-500" />,
-      action: () => navigate("/adminclub"),
-      color: "bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30"
-    },
-    {
-      title: "Event Management",
-      description: "Approve and monitor all events",
-      icon: <Calendar className="w-8 h-8 text-blue-500" />,
-      action: () => navigate("/adminevent"),
-      color: "bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/30"
-    },
-    {
-      title: "User Management",
-      description: "Manage user roles and permissions",
-      icon: <UserCheck className="w-8 h-8 text-emerald-500" />,
-      action: () => navigate("/adminusers"),
-      color: "bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30"
-    },
-    {
-      title: "System Settings",
-      description: "Configure platform settings",
-      icon: <Settings className="w-8 h-8 text-purple-500" />,
-      action: () => navigate("/adminsettings"),
-      color: "bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/30"
-    },
-    {
-      title: "Reports & Analytics",
-      description: "View platform usage statistics",
-      icon: <BarChart2 className="w-8 h-8 text-rose-500" />,
-      action: () => navigate("/adminanalytics"),
-      color: "bg-rose-500/10 hover:bg-rose-500/20 border-rose-500/30"
-    },
-    {
-      title: "Content Moderation",
-      description: "Review reported content",
-      icon: <AlertCircle className="w-8 h-8 text-orange-500" />,
-      action: () => navigate("/adminmoderation"),
-      color: "bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/30"
+interface EventProposal {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedBy: string;
+  timestamp: any;
+  [key: string]: any; // For any additional properties
+}
+
+interface Club {
+  id: string;
+  leaderId: string;
+  name: string;
+  [key: string]: any; // For any additional properties
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'club_created' | 'event_proposed' | 'event_approved' | 'member_joined';
+  title: string;
+  description: string;
+  timestamp: any;
+  clubName?: string;
+}
+
+const AdminPanel = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [stats, setStats] = useState<DashboardStats>({
+    totalClubs: 0,
+    totalLeaders: 0,
+    totalMembers: 0,
+    pendingProposals: 0,
+    approvedEvents: 0,
+    activeLeaders: 0
+  });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pendingProposals, setPendingProposals] = useState<EventProposal[]>([]);
+
+  // Fetch dashboard statistics
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+
+      // Get all clubs
+      const clubsSnap = await getDocs(collection(db, 'clubs'));
+      const clubs = clubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Club));
+
+      // Get all users with different roles
+      const leadersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'leader')));
+      const membersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'member')));
+
+      // Get pending proposals
+      const proposalsSnap = await getDocs(collectionGroup(db, 'eventProposals'));
+      const pendingProps = proposalsSnap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as EventProposal))
+        .filter(prop => prop.status === 'pending');
+
+      // Get approved events
+      const eventsSnap = await getDocs(collectionGroup(db, 'events'));
+      const approvedEvs = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Calculate active leaders (leaders who have clubs)
+      const activeLeaderIds = new Set(clubs.map(club => club.leaderId));
+
+      setStats({
+        totalClubs: clubs.length,
+        totalLeaders: leadersSnap.docs.length,
+        totalMembers: membersSnap.docs.length,
+        pendingProposals: pendingProps.length,
+        approvedEvents: approvedEvs.length,
+        activeLeaders: activeLeaderIds.size
+      });
+
+      setPendingProposals(pendingProps.slice(0, 5)); // Get first 5 for quick view
+
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const statsCards = [
+    { 
+      title: 'Total Clubs', 
+      value: stats.totalClubs, 
+      icon: Building2, 
+      change: '+3', 
+      color: 'blue',
+      link: '/AdminClub'
+    },
+    { 
+      title: 'Pending Events', 
+      value: stats.pendingProposals, 
+      icon: FiClock, 
+      change: '+2', 
+      color: 'yellow',
+      link: '/AdminEvents'
+    },
+    { 
+      title: 'Active Leaders', 
+      value: stats.activeLeaders, 
+      icon: Crown, 
+      change: '0', 
+      color: 'purple',
+      link: '/AdminClub'
+    },
+    { 
+      title: 'Total Members', 
+      value: stats.totalMembers, 
+      icon: LucideUsers, 
+      change: '+12', 
+      color: 'green',
+      link: '/dashboard'
+    },
   ];
 
+  const getColorClasses = (color: string) => {
+    const colors = {
+      blue: 'from-blue-600/20 to-blue-500/20 border-blue-500/30',
+      yellow: 'from-yellow-600/20 to-yellow-500/20 border-yellow-500/30',
+      purple: 'from-purple-600/20 to-purple-500/20 border-purple-500/30',
+      green: 'from-green-600/20 to-green-500/20 border-green-500/30'
+    };
+    return colors[color as keyof typeof colors] || colors.blue;
+  };
+
+  const getIconColor = (color: string) => {
+    const colors = {
+      blue: 'text-blue-400',
+      yellow: 'text-yellow-400',
+      purple: 'text-purple-400',
+      green: 'text-green-400'
+    };
+    return colors[color as keyof typeof colors] || colors.blue;
+  };
+
   return (
-    <div className="w-screen min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <Navbar />
 
-      <motion.main 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex-1 pt-24 pb-20 px-4 sm:px-6 lg:px-8"
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* Main Content */}
+      <main className="pt-20 pb-8 px-4 sm:px-6 lg:px-8 w-full max-w-none overflow-x-hidden">
+        <div className="w-full">
           {/* Header */}
-          <motion.div
-            initial={{ y: -20 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Administrator</span>
-            </h1>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Manage all aspects of the platform with full administrative privileges
-            </p>
-          </motion.div>
-
-          {/* Quick Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12"
-          >
-            {[
-              { label: "Active Clubs", value: "24", icon: <Shield className="w-5 h-5" />, change: "+3 this week" },
-              { label: "Pending Events", value: "12", icon: <Calendar className="w-5 h-5" />, change: "5 need review" },
-              { label: "New Users", value: "48", icon: <Users className="w-5 h-5" />, change: "+12 today" }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ y: -5 }}
-                className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">{stat.label}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
-                  </div>
-                  <div className="p-2 bg-gray-700/50 rounded-lg">
-                    {stat.icon}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Admin Cards */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {adminCards.map((card, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ y: -5, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                onClick={card.action}
-                className={`${card.color} border rounded-xl p-6 cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm`}
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="p-2 rounded-lg bg-gray-900/50">
-                    {card.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">{card.title}</h3>
-                    <p className="text-sm text-gray-400">{card.description}</p>
-                  </div>
-                </div>
-                <motion.div 
-                  className="mt-4 flex justify-end"
-                  whileHover={{ x: 5 }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Recent Activity */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-16 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6"
-          >
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <BookOpen className="w-5 h-5 mr-2 text-amber-400" />
-              Recent Activity
-            </h2>
-            <div className="space-y-4">
-              {[
-                { action: "New club registration", time: "10 min ago", user: "Tech Society" },
-                { action: "Event approval needed", time: "25 min ago", user: "Music Club" },
-                { action: "User role changed", time: "1 hour ago", user: "Alex Johnson" },
-                { action: "System update applied", time: "2 hours ago", user: "System" }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ x: 5 }}
-                  className="flex items-center justify-between py-3 border-b border-gray-700/50 last:border-0"
-                >
-                  <div>
-                    <p className="font-medium">{item.action}</p>
-                    <p className="text-sm text-gray-400">{item.user}</p>
-                  </div>
-                  <p className="text-sm text-gray-500">{item.time}</p>
-                </motion.div>
-              ))}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-xl border border-blue-500/30">
+                <FiShield className="w-8 h-8 text-blue-400" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Admin Dashboard
+                </h1>
+                <p className="text-slate-400 text-lg">Manage your club ecosystem with powerful admin tools</p>
+              </div>
             </div>
-          </motion.div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {statsCards.map((stat, index) => (
+              <Link 
+                key={index} 
+                to={stat.link}
+                className="block group"
+              >
+                <div className={`bg-gradient-to-br ${getColorClasses(stat.color)} backdrop-blur-sm border rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-400 text-sm font-medium">{stat.title}</p>
+                      <p className="text-3xl font-bold mt-1">
+                        {loading ? '...' : stat.value}
+                      </p>
+                      <p className="text-green-400 text-sm mt-1">{stat.change} this week</p>
+                    </div>
+                    <div className={`p-3 bg-slate-800/50 rounded-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <stat.icon className={`w-8 h-8 ${getIconColor(stat.color)}`} />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 mb-8">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+              Quick Actions
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Link 
+                to="/AdminClub"
+                className="flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
+              >
+                <FiPlus className="w-5 h-5" />
+                <span className="font-semibold">Create New Club</span>
+              </Link>
+              <Link 
+                to="/AdminEvents"
+                className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-green-500/25"
+              >
+                <FiCheck className="w-5 h-5" />
+                <span className="font-semibold">Review Events</span>
+              </Link>
+              <Link 
+                to="/AdminClub"
+                className="flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-6 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25"
+              >
+                <FiUsers className="w-5 h-5" />
+                <span className="font-semibold">Manage Leaders</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Pending Event Proposals */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
+              <div className="p-6 border-b border-slate-700/50">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                    Pending Event Proposals
+                  </h3>
+                  <Link 
+                    to="/AdminEvents"
+                    className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                  >
+                    View All
+                  </Link>
+                </div>
+              </div>
+              <div className="p-6">
+                {loading ? (
+                  <div className="text-center py-8 text-slate-400">
+                    <div className="animate-pulse">Loading...</div>
+                  </div>
+                ) : pendingProposals.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FiClock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-400">No pending proposals</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingProposals.slice(0, 3).map((proposal) => (
+                      <div key={proposal.id} className="p-4 bg-slate-700/50 rounded-lg border border-slate-600/50">
+                        <h4 className="font-semibold text-white mb-1">{proposal.title}</h4>
+                        <p className="text-slate-400 text-sm mb-2 line-clamp-2">{proposal.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-slate-500">By {proposal.submittedBy}</span>
+                          <div className="flex gap-2">
+                            <button className="p-1 bg-green-600/20 hover:bg-green-600/30 rounded text-green-400 transition-colors">
+                              <FiCheck className="w-4 h-4" />
+                            </button>
+                            <button className="p-1 bg-red-600/20 hover:bg-red-600/30 rounded text-red-400 transition-colors">
+                              <FiX className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* System Health */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
+              <div className="p-6 border-b border-slate-700/50">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-400" />
+                  System Overview
+                </h3>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-green-400 font-medium">All Systems Operational</span>
+                  </div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Active Clubs</span>
+                    <span className="text-white font-semibold">{stats.totalClubs}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Leaders Assigned</span>
+                    <span className="text-white font-semibold">{stats.activeLeaders}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Pending Reviews</span>
+                    <span className="text-yellow-400 font-semibold">{stats.pendingProposals}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Total Events</span>
+                    <span className="text-white font-semibold">{stats.approvedEvents}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity Feed */}
+          <div className="mt-8">
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
+              <div className="p-6 border-b border-slate-700/50">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <FiBell className="w-5 h-5 text-blue-400" />
+                  Recent Activity
+                </h3>
+              </div>
+              <div className="p-6">
+                <div className="text-center py-8">
+                  <FiBell className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                  <p className="text-slate-400">Activity feed coming soon</p>
+                  <p className="text-slate-500 text-sm">Track all system activities in real-time</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </motion.main>
+      </main>
 
       <Footer />
     </div>
   );
-}
+};
+
+export default AdminPanel;

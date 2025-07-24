@@ -51,12 +51,11 @@ export default function Dashboard() {
   }
 
   return (
-    <>
+    <div className="min-h-screen w-screen overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       {role === "admin" && <AdminPanel />}
       {role === "leader" && <LeaderPanel />}
       {role === "member" && <MemberPanel />}
       {role === "visitor" && <PublicPanel />}
-
-    </>
+    </div>
   );
 }
