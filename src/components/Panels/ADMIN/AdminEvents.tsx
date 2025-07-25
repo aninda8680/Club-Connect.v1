@@ -9,14 +9,15 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase";
 import {
-  Sparkles,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
+  Terminal,
+  AlertTriangle,
+  Check,
+  X,
   User,
-  Building2,
-  Calendar,
+  Users,
+  CalendarDays,
   Clock,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "../../Navbar";
 import Footer from "../../Footer";
@@ -47,7 +48,6 @@ export default function AdminEvents() {
   const [loading, setLoading] = useState(true);
   const [clubNames, setClubNames] = useState<Record<string, string>>({});
 
-  // Helper: Format Firestore Timestamp or Date
   function formatDate(date: any) {
     if (!date) return "";
     if (date.toDate) {
@@ -74,7 +74,6 @@ export default function AdminEvents() {
     return "";
   }
 
-  // Fetch all club names for mapping
   const fetchClubNames = async () => {
     const snap = await getDocs(collection(db, "clubs"));
     const names: Record<string, string> = {};
@@ -84,7 +83,6 @@ export default function AdminEvents() {
     setClubNames(names);
   };
 
-  // 🔍 Fetch event proposals
   const fetchProposals = async () => {
     try {
       const snapshot = await getDocs(collectionGroup(db, "eventProposals"));
@@ -109,11 +107,10 @@ export default function AdminEvents() {
 
       setProposals(result);
     } catch (err) {
-      console.error("❌ Error fetching proposals:", err);
+      console.error("Error fetching proposals:", err);
     }
   };
 
-  // 🔍 Fetch approved events
   const fetchEvents = async () => {
     try {
       const snapshot = await getDocs(collectionGroup(db, "events"));
@@ -134,11 +131,10 @@ export default function AdminEvents() {
 
       setEvents(result);
     } catch (err) {
-      console.error("❌ Error fetching events:", err);
+      console.error("Error fetching events:", err);
     }
   };
 
-  // Load all data
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
@@ -148,7 +144,6 @@ export default function AdminEvents() {
     loadAll();
   }, []);
 
-  // Fetch proposals and events after clubNames are loaded
   useEffect(() => {
     if (Object.keys(clubNames).length === 0) return;
     const loadData = async () => {
@@ -157,7 +152,6 @@ export default function AdminEvents() {
       setLoading(false);
     };
     loadData();
-    // eslint-disable-next-line
   }, [clubNames]);
 
   const handleApprove = async (proposal: Proposal) => {
@@ -182,7 +176,7 @@ export default function AdminEvents() {
       fetchProposals();
       fetchEvents();
     } catch (err) {
-      console.error("❌ Error approving proposal:", err);
+      console.error("Error approving proposal:", err);
     }
   };
 
@@ -198,150 +192,194 @@ export default function AdminEvents() {
       await setDoc(proposalRef, { status: "rejected" }, { merge: true });
       fetchProposals();
     } catch (err) {
-      console.error("❌ Error rejecting proposal:", err);
+      console.error("Error rejecting proposal:", err);
     }
   };
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-      <div className="py-20">
-        <div className="max-w-7xl mx-auto lg:p-8 space-y-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <Sparkles className="w-8 h-8 text-purple-400" />
+    <div className = "bg-black">
+      <div className="py-10">
+        <div className="max-w-7xl mx-auto p-4 space-y-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-green-900/50 rounded-lg border border-green-800/50">
+                <Terminal className="w-6 h-6 text-green-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-green-400">
+                  $ Admin Console
+                </h1>
+                <p className="text-gray-400 text-sm">Manage your digital ecosystem</p>
+              </div>
             </div>
-            <h1 className="text-4xl py-5 font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Event Management Dashboard
-            </h1>
-          </div>
-          <p className="text-slate-400 text-lg">Review and manage event proposals from clubs</p>
-        </div>
-
-        
-
-        {/* Pending Proposals Section */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <AlertCircle className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl font-bold text-white">Pending Event Proposals</h2>
           </div>
 
-          {loading ? (
-            <div className="text-center py-12 text-slate-400">Loading...</div>
-          ) : proposals.length === 0 ? (
-            <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8 text-center">
-              <Clock className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-              <p className="text-slate-400 text-lg">No pending proposals at the moment</p>
-              <p className="text-slate-500 text-sm mt-2">New proposals will appear here for review</p>
+          
+          {/* Pending Proposals Section */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-4 p-3 bg-gray-800/50 border border-gray-700 rounded-t-lg">
+              <AlertTriangle className="w-5 h-5 text-yellow-400" />
+              <h2 className="text-lg font-semibold text-gray-300">
+                Pending Event Proposals
+              </h2>
+              <span className="ml-auto text-xs bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded">
+                {proposals.length} pending
+              </span>
             </div>
-          ) : (
-            <div className="grid gap-6">
-              {proposals.map((proposal) => (
-                <div
-                  key={proposal.id}
-                  className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/70 transition-all duration-300 hover:border-purple-500/30"
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="p-2 bg-yellow-500/20 rounded-lg">
-                          <Calendar className="w-5 h-5 text-yellow-400" />
+
+            {loading ? (
+              <div className="p-8 text-center text-gray-500 border border-gray-700 rounded-b-lg">
+                <Clock className="w-8 h-8 mx-auto mb-2" />
+                <span className="text-sm">Loading proposals...</span>
+              </div>
+            ) : proposals.length === 0 ? (
+              <div className="p-8 text-center text-gray-500 border border-gray-700 rounded-b-lg">
+                <Clock className="w-8 h-8 mx-auto mb-2" />
+                <p className="text-sm">No pending proposals at the moment</p>
+                <p className="text-xs mt-1">New proposals will appear here for review</p>
+              </div>
+            ) : (
+              <div className="space-y-3 border border-gray-700 border-t-0 rounded-b-lg p-4">
+                {proposals.map((proposal) => (
+                  <div
+                    key={proposal.id}
+                    className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-yellow-500/30 transition-colors"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="p-1.5 bg-yellow-900/50 rounded border border-yellow-800/50">
+                            <CalendarDays className="w-4 h-4 text-yellow-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-base font-semibold text-gray-200 mb-1">
+                              {proposal.title}
+                            </h3>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                              {proposal.description}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-xl font-semibold text-white mb-1">{proposal.title}</h3>
-                          <p className="text-slate-300 leading-relaxed">{proposal.description}</p>
+
+                        <div className="flex flex-wrap gap-4 text-xs">
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <User className="w-3 h-3" />
+                            <span>
+                              Submitted by:{" "}
+                              <span className="text-gray-300">
+                                {proposal.submittedBy}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <Users className="w-3 h-3" />
+                            <span>
+                              Club:{" "}
+                              <span className="text-blue-400">
+                                {proposal.clubName}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <CalendarDays className="w-3 h-3" />
+                            <span className="text-green-400">
+                              {formatDate(proposal.date)}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <User className="w-4 h-4" />
-                          <span>Submitted by: <span className="text-purple-400 font-medium">{proposal.submittedBy}</span></span>
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <Building2 className="w-4 h-4" />
-                          <span>Club: <span className="text-blue-400 font-medium">{proposal.clubName}</span></span>
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-green-400 font-medium">{formatDate(proposal.date)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleApprove(proposal)}
-                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-green-500/25"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleReject(proposal)}
-                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-500/25"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Approved Events Section */}
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <CheckCircle className="w-6 h-6 text-green-400" />
-            <h2 className="text-2xl font-bold text-white">Approved Events</h2>
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12 text-slate-400">Loading...</div>
-          ) : events.length === 0 ? (
-            <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8 text-center">
-              <Calendar className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-              <p className="text-slate-400 text-lg">No approved events yet</p>
-              <p className="text-slate-500 text-sm mt-2">Approved events will be displayed here</p>
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {events.map((event) => (
-                <div
-                  key={event.id}
-                  className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-green-500/20 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white mb-1">{event.title}</h3>
-                      <p className="text-slate-300 mb-3 leading-relaxed">{event.description}</p>
-
-                      <div className="flex flex-wrap gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <Building2 className="w-4 h-4" />
-                          <span>Club: <span className="text-blue-400 font-medium">{event.clubName}</span></span>
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-green-400 font-medium">{formatDate(event.date)}</span>
-                        </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprove(proposal)}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-900/50 hover:bg-green-800/50 text-green-400 text-xs font-medium rounded-lg border border-green-800/50 transition-colors"
+                        >
+                          <Check className="w-3 h-3" />
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(proposal)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-900/50 hover:bg-red-800/50 text-red-400 text-xs font-medium rounded-lg border border-red-800/50 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                          Reject
+                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Approved Events Section */}
+          <div>
+            <div className="flex items-center gap-3 mb-4 p-3 bg-gray-800/50 border border-gray-700 rounded-t-lg">
+              <Check className="w-5 h-5 text-green-400" />
+              <h2 className="text-lg font-semibold text-gray-300">
+                Approved Events
+              </h2>
+              <span className="ml-auto text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded">
+                {events.length} approved
+              </span>
             </div>
-          )}
+
+            {loading ? (
+              <div className="p-8 text-center text-gray-500 border border-gray-700 rounded-b-lg">
+                <Clock className="w-8 h-8 mx-auto mb-2" />
+                <span className="text-sm">Loading events...</span>
+              </div>
+            ) : events.length === 0 ? (
+              <div className="p-8 text-center text-gray-500 border border-gray-700 rounded-b-lg">
+                <CalendarDays className="w-8 h-8 mx-auto mb-2" />
+                <p className="text-sm">No approved events yet</p>
+                <p className="text-xs mt-1">Approved events will be displayed here</p>
+              </div>
+            ) : (
+              <div className="space-y-3 border border-gray-700 border-t-0 rounded-b-lg p-4">
+                {events.map((event) => (
+                  <div
+                    key={event.id}
+                    className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-green-500/30 transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="p-1.5 bg-green-900/50 rounded border border-green-800/50">
+                        <Check className="w-4 h-4 text-green-400" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-base font-semibold text-gray-200 mb-1">
+                          {event.title}
+                        </h3>
+                        <p className="text-gray-400 text-sm mb-3 leading-relaxed">
+                          {event.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-4 text-xs">
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <Users className="w-3 h-3" />
+                            <span>
+                              Club:{" "}
+                              <span className="text-blue-400">
+                                {event.clubName}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <CalendarDays className="w-3 h-3" />
+                            <span className="text-green-400">
+                              {formatDate(event.date)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
