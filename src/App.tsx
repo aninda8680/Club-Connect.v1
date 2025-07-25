@@ -11,10 +11,13 @@ import NotAuthorized from "./pages/NotAuthorized";
 import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
 import Profile from "./pages/Profile";
 import AdminClub from "./components/Panels/ADMIN/AdminClubs";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer"
 
 export default function App() {
   return (
-    <div>
+    <div className="min-h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
+      <Navbar/>
       <main>
         <Routes>
           <Route path="/" element={<AuthPage />} />
@@ -72,6 +75,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
