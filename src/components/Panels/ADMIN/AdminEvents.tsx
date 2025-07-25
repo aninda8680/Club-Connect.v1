@@ -204,7 +204,6 @@ export default function AdminEvents() {
 
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-      <Navbar/>
       <div className="py-20">
         <div className="max-w-7xl mx-auto lg:p-8 space-y-8">
         {/* Header */}
@@ -344,7 +343,6 @@ export default function AdminEvents() {
         </div>
       </div>
       </div>
-      <Footer />
     </div>
   );
 }
