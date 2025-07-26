@@ -87,8 +87,7 @@ export default function Profile() {
   };
 
   return (
-        <div className="min-h-screen w-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-              <Navbar />
+    <div className = "bg-black">
       <div className="max-w-3xl py-30 mx-auto">
         {/* Header with animated gradient */}
         <div className="relative mb-8 p-8 bg-white/80 dark:bg-zinc-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-zinc-700/30 overflow-hidden">
@@ -207,7 +206,6 @@ export default function Profile() {
           </button>
         </div>
       </div>
-    <Footer/>
     </div>
     
   );
