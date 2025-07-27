@@ -3,7 +3,7 @@ import { auth } from "../firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { Code, Terminal, Cpu, Server, ChevronRight } from "lucide-react";
+import { Terminal, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AuthPage() {
