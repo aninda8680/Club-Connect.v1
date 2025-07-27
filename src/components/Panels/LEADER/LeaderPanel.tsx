@@ -1,26 +1,18 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from  "../../../firebase";
 import { useAuth } from "../../../AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Terminal,
   Users,
   Calendar,
   MessageSquare,
   BarChart3,
-  Shield,
   ChevronRight,
-  PlusCircle,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Settings,
   Bell,
-  Search,
-  Clock,
-  Sparkles
+  Clock
 } from "lucide-react";
 
 export default function LeaderPanel() {
