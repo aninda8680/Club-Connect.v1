@@ -21,14 +21,10 @@ import {
   Loader2,
   Trash2,
   Terminal,
-  Cpu,
   Code,
   Database,
-  Server
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import Navbar from "../../Navbar";
-import Footer from "../../Footer";
 import { motion, AnimatePresence, useAnimation, useInView } from "framer-motion";
 
 const ScrollAnimationWrapper = ({ children }: { children: React.ReactNode }) => {
