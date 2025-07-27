@@ -1,28 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
   FiUsers,
-  FiCalendar,
-  FiShield,
   FiPlus,
   FiCheck,
   FiX,
-  FiEye,
-  FiSettings,
   FiBell,
-  FiSearch,
-  FiTrendingUp,
-  FiClock,
-  FiAlertCircle
+  FiClock
 } from 'react-icons/fi';
 import {
-  Building2,
-  Crown,
+  
   Sparkles,
   CheckCircle,
-  XCircle,
   AlertTriangle,
-  TrendingUp,
-  Users as LucideUsers,
   Code,
   Terminal,
   Cpu,
@@ -107,7 +96,7 @@ const AdminPanel = () => {
 
   const [pendingProposals, setPendingProposals] = useState<EventProposal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isHovering, setIsHovering] = useState<string | null>(null);
+  // Removed unused isHovering state
 
   const fetchStats = async () => {
     try {
@@ -152,61 +141,6 @@ const AdminPanel = () => {
   useEffect(() => {
     fetchStats();
   }, []);
-
-  const statsCards = [
-    {
-      title: 'Total Clubs',
-      value: stats.totalClubs,
-      icon: Terminal,
-      change: '+3',
-      color: 'blue',
-      link: '/AdminClub'
-    },
-    {
-      title: 'Pending Events',
-      value: stats.pendingProposals,
-      icon: Cpu,
-      change: '+2',
-      color: 'yellow',
-      link: '/AdminEvents'
-    },
-    {
-      title: 'Active Leaders',
-      value: stats.activeLeaders,
-      icon: Code,
-      change: '0',
-      color: 'purple',
-      link: '/AdminClub'
-    },
-    {
-      title: 'Total Members',
-      value: stats.totalMembers,
-      icon: Database,
-      change: '+12',
-      color: 'green',
-      link: '/dashboard'
-    }
-  ];
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: 'from-blue-900/70 to-blue-800/70 border-blue-700/50 hover:border-blue-500/70',
-      yellow: 'from-amber-900/70 to-amber-800/70 border-amber-700/50 hover:border-amber-500/70',
-      purple: 'from-purple-900/70 to-purple-800/70 border-purple-700/50 hover:border-purple-500/70',
-      green: 'from-emerald-900/70 to-emerald-800/70 border-emerald-700/50 hover:border-emerald-500/70'
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
-  };
-
-  const getIconColor = (color: string) => {
-    const colors = {
-      blue: 'text-blue-400 group-hover:text-blue-300',
-      yellow: 'text-amber-400 group-hover:text-amber-300',
-      purple: 'text-purple-400 group-hover:text-purple-300',
-      green: 'text-emerald-400 group-hover:text-emerald-300'
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
-  };
 
   const getStatusColor = (status: string) => {
     const colors = {
