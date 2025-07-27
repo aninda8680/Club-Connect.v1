@@ -15,12 +15,9 @@ import {
   Clock,
   MapPin,
   Plus,
-  XCircle,
   CheckCircle,
   AlertTriangle,
   Terminal,
-  Sparkles,
-  Server,
   Bell,
   GitBranch,
   Database,
@@ -66,7 +63,6 @@ export default function LeaderEventsPanel() {
   const [isCreating, setIsCreating] = useState(false);
   const [proposals, setProposals] = useState<EventProposal[]>([]);
   const [approvedEvents, setApprovedEvents] = useState<EventProposal[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Define stats for the dashboard cards
   const stats = [
@@ -111,7 +107,6 @@ export default function LeaderEventsPanel() {
 
   const fetchProposals = async () => {
     if (!clubId) return;
-    setLoading(true);
 
     try {
       const proposalSnap = await getDocs(collection(db, `clubs/${clubId}/eventProposals`));
@@ -148,10 +143,7 @@ export default function LeaderEventsPanel() {
     } catch (error) {
       console.error("Error fetching proposals or approved events:", error);
     }
-
-    setLoading(false);
   };
-
   useEffect(() => {
     if (clubId) fetchProposals();
   }, [clubId]);
