@@ -217,15 +217,6 @@ const AdminPanel = () => {
     return colors[status as keyof typeof colors] || colors.pending;
   };
 
-  const loadingSkeleton = Array(4).fill(0).map((_, i) => (
-    <motion.div
-      key={i}
-      initial={{ opacity: 0.5 }}
-      animate={{ opacity: 0.8 }}
-      transition={{ repeat: Infinity, repeatType: "reverse", duration: 1.5 }}
-      className="h-32 bg-slate-800/50 rounded-xl border border-slate-700/50"
-    />
-  ));
 
   return (
     <div className = "bg-black">
