@@ -4,8 +4,7 @@ import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebase";
 import { useAuth } from "../AuthContext";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+
 
 export default function Profile() {
   const { user } = useAuth();
