@@ -16,11 +16,8 @@ import {
   User,
   Users,
   CalendarDays,
-  Clock,
-  ChevronRight,
+  Clock
 } from "lucide-react";
-import Navbar from "../../Navbar";
-import Footer from "../../Footer";
 
 interface Proposal {
   id: string;
