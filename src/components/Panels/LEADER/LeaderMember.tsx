@@ -261,6 +261,8 @@ export default function LeaderMember() {
 
   return (
     <div className="bg-black py-15">
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20 pointer-events-none" />
+      <main className="relative pt-8 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -726,6 +728,7 @@ export default function LeaderMember() {
           </div>
         </motion.div>
       </div>
+      </main>
     </div>
   );
 }
