@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
@@ -12,12 +12,17 @@ import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
 import Profile from "./pages/Profile";
 import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer"
+import Footer from "./components/Footer";
 
 export default function App() {
+  const location = useLocation();
+
+  // Check if current route is "/" (AuthPage)
+  const hideNavbar = location.pathname === "/";
+
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
-      <Navbar/>
+      {!hideNavbar && <Navbar />}
       <main>
         <Routes>
           <Route path="/" element={<AuthPage />} />
