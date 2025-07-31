@@ -33,6 +33,7 @@ export default function Navbar() {
     { to: "/LeaderEvents", label: "Events", roles: ["leader"] },
     { to: "/manage", label: "Members", roles: ["leader"] },
     { to: "/events", label: "Events", roles: ["member", "visitor"] },
+    { to: "/clubs/:clubId/chat", label: "Chat", roles: ["member", "leader"] },
   ];
 
   const getRoleIcon = () => {

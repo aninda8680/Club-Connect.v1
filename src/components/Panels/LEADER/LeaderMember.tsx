@@ -122,20 +122,31 @@ export default function LeaderMember() {
 
   // Accept a user
   const handleAccept = async (userId: string, name: string, email: string) => {
-    try {
-      await setDoc(doc(db, "users", userId), { role: "member" }, { merge: true });
-      await setDoc(doc(db, `clubs/${clubId}/members/${userId}`), {
-        name,
-        email,
-        joinedAt: Timestamp.now(),
-      });
-      await deleteDoc(doc(db, `clubs/${clubId}/joinRequests/${userId}`));
-      toast.success("✅ User accepted successfully");
-    } catch (err) {
-      console.error("Failed to accept user:", err);
-      toast.error("❌ Failed to accept user");
-    }
-  };
+  try {
+    // ✅ Set user's role AND clubId
+    await setDoc(doc(db, "users", userId), {
+      role: "member",
+      clubId: clubId, // 👈 Add this line
+    }, { merge: true });
+
+    // ✅ Add to members subcollection
+    await setDoc(doc(db, `clubs/${clubId}/members/${userId}`), {
+      name,
+      userId,
+      email,
+      joinedAt: Timestamp.now(),
+    });
+
+    // ✅ Remove from join requests
+    await deleteDoc(doc(db, `clubs/${clubId}/joinRequests/${userId}`));
+
+    toast.success("✅ User accepted successfully");
+  } catch (err) {
+    console.error("Failed to accept user:", err);
+    toast.error("❌ Failed to accept user");
+  }
+};
+
 
   // Reject a user
   const handleReject = async (userId: string) => {

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
@@ -13,11 +13,22 @@ import Profile from "./pages/Profile";
 import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+ // ✅ Import the Chat page
+import ChatPage from "./pages/ChatPage"; 
+
+// Wrapper component to extract clubId from URL params
+function ChatPageWrapper() {
+  const { clubId } = useParams<{ clubId: string }>();
+  
+  if (!clubId) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <ChatPage clubId={clubId} />;
+}
 
 export default function App() {
   const location = useLocation();
-
-  // Check if current route is "/" (AuthPage)
   const hideNavbar = location.pathname === "/";
 
   return (
@@ -26,6 +37,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<AuthPage />} />
+          
           <Route
             path="/dashboard"
             element={
@@ -34,15 +46,18 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/AdminClub" 
+
+          <Route
+            path="/AdminClub"
             element={
               <ProtectedRoute>
                 <AdminClub />
               </ProtectedRoute>
             }
           />
+
           <Route path="/events" element={<PublicEventList />} />
+
           <Route
             path="/LeaderEvents"
             element={
@@ -51,6 +66,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/manage"
             element={
@@ -59,6 +75,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/clubs/:clubId"
             element={
@@ -67,8 +84,20 @@ export default function App() {
               </RoleProtectedRoute>
             }
           />
+
+          {/* ✅ Chat route protected for logged-in users */}
+          <Route
+            path="/clubs/:clubId/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPageWrapper />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/not-authorized" element={<NotAuthorized />} />
           <Route path="/Profile" element={<Profile />} />
+          
           <Route
             path="/AdminEvents"
             element={
@@ -77,6 +106,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
