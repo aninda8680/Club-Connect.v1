@@ -133,6 +133,7 @@ export default function LeaderMember() {
     await setDoc(doc(db, `clubs/${clubId}/members/${userId}`), {
       name,
       userId,
+      clubId,
       email,
       joinedAt: Timestamp.now(),
     });

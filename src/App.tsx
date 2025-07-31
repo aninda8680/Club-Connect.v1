@@ -13,19 +13,10 @@ import Profile from "./pages/Profile";
 import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
- // ✅ Import the Chat page
+
 import ChatPage from "./pages/ChatPage"; 
 
-// Wrapper component to extract clubId from URL params
-function ChatPageWrapper() {
-  const { clubId } = useParams<{ clubId: string }>();
-  
-  if (!clubId) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
-  return <ChatPage clubId={clubId} />;
-}
+
 
 export default function App() {
   const location = useLocation();
@@ -85,15 +76,14 @@ export default function App() {
             }
           />
 
-          {/* ✅ Chat route protected for logged-in users */}
           <Route
-            path="/clubs/:clubId/chat"
-            element={
-              <ProtectedRoute>
-                <ChatPageWrapper />
-              </ProtectedRoute>
-            }
-          />
+  path="/clubs/:clubId/chat"
+  element={
+    <ProtectedRoute>
+      <ChatPage />
+    </ProtectedRoute>
+  }
+/>
 
           <Route path="/not-authorized" element={<NotAuthorized />} />
           <Route path="/Profile" element={<Profile />} />

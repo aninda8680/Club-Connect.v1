@@ -117,6 +117,7 @@ export default function AdminClub() {
         description: "",
         createdAt: Timestamp.now(),
         leaderId: selectedLeader,
+        clubId: `${clubName.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
       });
       setClubName("");
       setSelectedLeader("");
