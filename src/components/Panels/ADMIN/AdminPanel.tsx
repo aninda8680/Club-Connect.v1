@@ -177,7 +177,7 @@ const AdminPanel = () => {
                     Admin Console
                   </h1>
                   <p className="text-slate-400 text-sm md:text-lg">
-                    <span className="text-green-400">$</span> Manage your digital ecosystem
+                    <span className="text-green-400">$</span> Manage your digital ecosystem...!!
                   </p>
                 </div>
               </div>
