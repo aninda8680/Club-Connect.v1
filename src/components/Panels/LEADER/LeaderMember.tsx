@@ -131,7 +131,7 @@ export default function LeaderMember() {
 
     // ✅ Add to members subcollection
     await setDoc(doc(db, `clubs/${clubId}/members/${userId}`), {
-      name,
+      displayName: name,
       userId,
       clubId,
       email,
@@ -164,7 +164,7 @@ export default function LeaderMember() {
   const handleRemoveMember = async (userId: string) => {
     try {
       await deleteDoc(doc(db, `clubs/${clubId}/members/${userId}`));
-      await setDoc(doc(db, `users/${userId}`), { role: "visitor" }, { merge: true });
+      await setDoc(doc(db, `users/${userId}`), { role: "visitor", clubId: null }, { merge: true });
       toast.success(" Member removed");
     } catch (err) {
       console.error("Failed to remove member:", err);
@@ -197,7 +197,7 @@ export default function LeaderMember() {
 
   // Filter members based on search and filter
   const filteredMembers = members.filter(member => {
-    const matchesSearch = member.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = member.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          member.email?.toLowerCase().includes(searchTerm.toLowerCase());
     
     if (activeFilter === "new") {
@@ -213,7 +213,8 @@ export default function LeaderMember() {
 
   // Get recent members for timeline
   const recentMembers = [...members]
-    .sort((a,b) => b.joinedAt - a.joinedAt)
+    .sort((a, b) => b.joinedAt?.getTime() - a.joinedAt?.getTime())
+
     .slice(0, 3);
 
   const exportToExcel = async () => {
@@ -222,7 +223,7 @@ export default function LeaderMember() {
   // 🟢 Active Members Sheet
   const memberSheet = workbook.addWorksheet('Active Members');
   memberSheet.columns = [
-    { header: 'Name', key: 'name', width: 30 },
+    { header: 'Name', key: 'displayName', width: 30 },
     { header: 'Email', key: 'email', width: 30 },
     { header: 'Join Date', key: 'joinedAt', width: 20 },
     { header: 'Status', key: 'status', width: 15 },
@@ -230,7 +231,7 @@ export default function LeaderMember() {
 
   members.forEach(member => {
     memberSheet.addRow({
-      name: member.name || "N/A",
+      displayName: member.displayName || "N/A",
       email: member.email || "N/A",
       joinedAt: member.joinedAt?.toLocaleDateString() || "N/A",
       status: "Active",
@@ -521,7 +522,7 @@ export default function LeaderMember() {
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <p className="font-medium">{member.name || member.email || member.id}</p>
+                                <p className="font-medium">{member.displayName || member.email || member.id}</p>
                                 <div className="relative group">
                                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-900/30 text-purple-400 border border-purple-800/50">
                                     Member
@@ -676,7 +677,7 @@ export default function LeaderMember() {
                     </div>
                     <div>
                       <p className="text-sm">
-                        <span className="text-purple-400">{member.name || member.email}</span> joined
+                        <span className="text-purple-400">{member.displayName || member.email}</span> joined
                       </p>
                       <p className="text-xs text-gray-500">
                         {member.joinedAt.toLocaleDateString()} at {member.joinedAt.toLocaleTimeString()}
