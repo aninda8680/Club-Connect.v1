@@ -8,8 +8,10 @@ import { motion } from "framer-motion";
 
 export default function LandingPage() {
   const [clubs, setClubs] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [role, setRole] = useState<string | null>(null);
   const [joinedClubs, setJoinedClubs] = useState<Set<string>>(new Set());
+  const [interestedEvents, setInterestedEvents] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -19,6 +21,26 @@ export default function LandingPage() {
       const clubSnap = await getDocs(collection(db, "clubs"));
       const clubList = clubSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setClubs(clubList);
+
+      // Fetch events from all clubs
+      let allEvents: any[] = [];
+      for (const clubDoc of clubSnap.docs) {
+        const clubId = clubDoc.id;
+        const clubName = clubDoc.data().name || "Unnamed Club";
+        
+        const eventsRef = collection(db, `clubs/${clubId}/events`);
+        const eventsSnap = await getDocs(eventsRef);
+        
+        const eventsData = eventsSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          clubName: clubName,
+          clubId: clubId,
+        }));
+        
+        allEvents = [...allEvents, ...eventsData];
+      }
+      setEvents(allEvents);
 
       // Only fetch role & joined status if logged in
       if (user) {
@@ -46,6 +68,49 @@ export default function LandingPage() {
       // TODO: Send join request logic here
       console.log(`Send join request for club: ${clubId}`);
     }
+  };
+
+  const handleInterested = (eventId: string) => {
+    if (!user) {
+      // Redirect guests to auth page
+      navigate("/auth");
+    } else {
+      setInterestedEvents((prev) => {
+        const updated = new Set(prev);
+        if (updated.has(eventId)) {
+          updated.delete(eventId);
+        } else {
+          updated.add(eventId);
+        }
+        return updated;
+      });
+    }
+  };
+
+  const formatDate = (date: any) => {
+    if (!date) return "Date TBD";
+    if (date.toDate) {
+      return date.toDate().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+    if (date.seconds) {
+      return new Date(date.seconds * 1000).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+    if (typeof date === "string" || date instanceof Date) {
+      return new Date(date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+    return "Date TBD";
   };
 
   return (
@@ -88,15 +153,43 @@ export default function LandingPage() {
             clubs.map((club) => (
               <motion.div
                 key={club.id}
-                className="bg-gray-900 rounded-xl p-6 shadow-lg hover:shadow-cyan-500/20 transition"
+                className={`bg-gray-900 rounded-xl p-6 shadow-lg transition cursor-pointer ${
+                  club.name === "Cy-Coders" 
+                    ? "hover:shadow-cyan-500/30 hover:scale-105 border border-transparent hover:border-cyan-500/50" 
+                    : "hover:shadow-cyan-500/20"
+                }`}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
+                onClick={() => {
+                  // Navigate to specific club page based on club name
+                  if (club.name === "Cy-Coders") {
+                    navigate("/clubs/cy-coders");
+                  } else {
+                    // For other clubs, you can add more specific routes later
+                    navigate("/clubs-created");
+                  }
+                }}
               >
-                <h3 className="text-xl font-bold mb-2">{club.name}</h3>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-bold">{club.name}</h3>
+                  {club.name === "Cy-Coders" && (
+                    <span className="text-xs bg-cyan-600 text-white px-2 py-1 rounded-full">
+                      🚀 Featured
+                    </span>
+                  )}
+                </div>
                 <p className="text-gray-400 text-sm mb-4">{club.description}</p>
+                {club.name === "Cy-Coders" && (
+                  <p className="text-xs text-cyan-400 mb-3 flex items-center gap-1">
+                    <span>👆 Click to explore</span>
+                  </p>
+                )}
                 <button
-                  onClick={() => handleJoin(club.id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click when button is clicked
+                    handleJoin(club.id);
+                  }}
                   className="px-4 py-2 bg-cyan-600 rounded-lg hover:bg-cyan-500 transition"
                 >
                   {user
@@ -104,6 +197,48 @@ export default function LandingPage() {
                       ? "✅ Joined"
                       : "➕ Join"
                     : "🔑 Join"}
+                </button>
+              </motion.div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* Featured Events */}
+      <section className="min-h-screen px-8 py-12 snap-start">
+        <h2 className="text-center text-3xl font-bold mb-8">🎉 Upcoming Events</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {events.length === 0 ? (
+            <p className="text-gray-400">No events available right now.</p>
+          ) : (
+            events.map((event) => (
+              <motion.div
+                key={event.id}
+                className="bg-gray-900 rounded-xl p-6 shadow-lg hover:shadow-fuchsia-500/20 transition"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-2 py-1 bg-fuchsia-600 text-white text-xs rounded-full">
+                    {event.clubName}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold mb-2">{event.title}</h3>
+                <p className="text-gray-400 text-sm mb-3">{event.description}</p>
+                <div className="text-sm text-gray-300 mb-4">
+                  <p>📅 {formatDate(event.date)}</p>
+                  {event.location && <p>📍 {event.location}</p>}
+                </div>
+                <button
+                  onClick={() => handleInterested(event.id)}
+                  className="px-4 py-2 bg-fuchsia-600 rounded-lg hover:bg-fuchsia-500 transition"
+                >
+                  {user
+                    ? interestedEvents.has(event.id)
+                      ? "✅ Interested"
+                      : "🎯 Mark Interested"
+                    : "🔑 Mark Interested"}
                 </button>
               </motion.div>
             ))

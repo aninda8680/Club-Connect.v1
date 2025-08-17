@@ -16,10 +16,11 @@ import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 import Navbar from "./components/Navbar";
 //import Footer from "./components/Footer";
 import ChatPage from "./pages/ChatPage";
+import CyCoders from "./pages/Clubs/Cy-Coders/Cy-Coders";
 
 export default function App() {
   const location = useLocation();
-  const hideNavbar = location.pathname === "/" || location.pathname === "/auth";
+  const hideNavbar = location.pathname === "/" || location.pathname === "/auth" || location.pathname === "/clubs/cy-coders";
 
   return (
     <div className="h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
@@ -28,6 +29,7 @@ export default function App() {
         <Routes>
           {/* Public landing page */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/clubs/cy-coders" element={<CyCoders />} />
           <Route path="/auth" element={<AuthPage />} />
 
           {/* Protected user routes */}
