@@ -1,5 +1,5 @@
-// src/App.tsx
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import LandingPage from "./pages/landing";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
@@ -14,49 +14,83 @@ import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
 import Profile from "./pages/Profile";
 import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 import Navbar from "./components/Navbar";
-//import Footer from "./components/Footer";
-
 import CyCoders from "./pages/Clubs/Cy-Coders/Cy-Coders";
+import ProfileCompletionPage from "./pages/ProfileCompletionPage";
 
 export default function App() {
   const location = useLocation();
-  const hideNavbar = location.pathname === "/" || location.pathname === "/auth" || location.pathname === "/clubs/cy-coders";
+  const { user, loading, profileComplete } = useAuth();
+
+  // ✅ Hide navbar on landing, login, profile completion, and public club view
+  const hideNavbar =
+    location.pathname === "/" ||
+    location.pathname === "/auth" ||
+    location.pathname.startsWith("/clubs/") ||
+    location.pathname === "/complete-profile";
 
   return (
     <div className="h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
-      {!hideNavbar && <Navbar />}
+      {/* ✅ Navbar only when logged in + profile completed */}
+      {!hideNavbar && user && profileComplete && <Navbar />}
+
       <main>
         <Routes>
-          {/* Public landing page */}
+          {/* Public routes → no firebase wait */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/clubs/cy-coders" element={<CyCoders />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/clubs/cy-coders" element={<CyCoders />} />
+          <Route path="/events" element={<PublicEventList />} />
 
-          {/* Protected user routes */}
+          {/* ✅ Profile completion (wait for firebase) */}
           <Route
-            path="/dashboard"
+            path="/complete-profile"
             element={
-              <ProtectedRoute>
-                <Dashboard />
+              <ProtectedRoute requireAuth>
+                {loading ? (
+                  <div className="flex items-center justify-center h-screen bg-black text-slate-200">
+                    <p className="text-lg animate-pulse">Loading...</p>
+                  </div>
+                ) : profileComplete ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <ProfileCompletionPage />
+                )}
               </ProtectedRoute>
             }
           />
 
+          {/* ✅ Dashboard (wait for firebase) */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute requireAuth>
+                {loading ? (
+                  <div className="flex items-center justify-center h-screen bg-black text-slate-200">
+                    <p className="text-lg animate-pulse">Loading...</p>
+                  </div>
+                ) : profileComplete ? (
+                  <Dashboard />
+                ) : (
+                  <Navigate to="/complete-profile" replace />
+                )}
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Other protected routes */}
           <Route
             path="/AdminClub"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireAuth>
                 <AdminClub />
               </ProtectedRoute>
             }
           />
 
-          <Route path="/events" element={<PublicEventList />} />
-
           <Route
             path="/LeaderEvents"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireAuth>
                 <LeaderEventsPanel />
               </ProtectedRoute>
             }
@@ -65,7 +99,7 @@ export default function App() {
           <Route
             path="/manage"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireAuth>
                 <LeaderMember />
               </ProtectedRoute>
             }
@@ -80,24 +114,25 @@ export default function App() {
             }
           />
 
-          
           <Route path="/not-authorized" element={<NotAuthorized />} />
           <Route path="/Profile" element={<Profile />} />
 
           <Route
             path="/AdminEvents"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireAuth>
                 <AdminEventPage />
               </ProtectedRoute>
             }
           />
 
-          {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* ✅ Catch-all fallback */}
+          <Route
+            path="*"
+            element={<Navigate to={user ? "/dashboard" : "/"} replace />}
+          />
         </Routes>
       </main>
-      {/* <Footer /> */}
     </div>
   );
 }

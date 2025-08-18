@@ -82,36 +82,44 @@ export default function AuthPage() {
       <div className="relative z-10 w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Left Panel - Brand Info */}
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col justify-center"
-        >
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-gradient-to-br from-blue-900 to-blue-800 border border-blue-700 rounded-lg">
-                <Terminal className="w-8 h-8 text-blue-400" />
-              </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Club-Connect
-              </h1>
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-100 mb-4">
-              Developer Portal
-            </h2>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              Secure access to the Adamas university's club management system.
-              Built for developers, by developers.
-            </p>
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6 }}
+      className="flex flex-col justify-center"
+    >
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-gradient-to-br from-blue-900 to-blue-800 border border-blue-700 rounded-lg">
+            <Terminal className="w-8 h-8 text-blue-400" />
           </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Club-Connect
+          </h1>
+        </div>
+        <h2 className="text-2xl font-semibold text-gray-100 mb-4">
+          Developer Portal
+        </h2>
+        <p className="text-gray-400 mb-6 leading-relaxed">
+          Secure access to the Adamas university's club management system.
+          Built for developers, by developers.
+        </p>
 
-          <div className="mt-8 pt-6 border-t border-gray-800">
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <span></span>
-              <ChevronRight className="w-4 h-4" />
-            </div>
-          </div>
-        </motion.div>
+        {/* Button to redirect to Landing Page */}
+        <button
+          onClick={() => navigate("/")}
+          className="px-5 py-2 mt-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-medium rounded-lg shadow-lg hover:opacity-90 transition"
+        >
+          Home-Page
+        </button>
+      </div>
+
+      <div className="mt-8 pt-6 border-t border-gray-800">
+        <div className="flex items-center gap-2 text-gray-500 text-sm">
+          <span></span>
+          <ChevronRight className="w-4 h-4" />
+        </div>
+      </div>
+    </motion.div>
 
         {/* Right Panel - Auth Card */}
         <motion.div
