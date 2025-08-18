@@ -17,32 +17,26 @@ export default function LandingPage() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      // Always fetch clubs for guests too
       const clubSnap = await getDocs(collection(db, "clubs"));
       const clubList = clubSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setClubs(clubList);
 
-      // Fetch events from all clubs
       let allEvents: any[] = [];
       for (const clubDoc of clubSnap.docs) {
         const clubId = clubDoc.id;
         const clubName = clubDoc.data().name || "Unnamed Club";
-        
         const eventsRef = collection(db, `clubs/${clubId}/events`);
         const eventsSnap = await getDocs(eventsRef);
-        
         const eventsData = eventsSnap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
           clubName: clubName,
           clubId: clubId,
         }));
-        
         allEvents = [...allEvents, ...eventsData];
       }
       setEvents(allEvents);
 
-      // Only fetch role & joined status if logged in
       if (user) {
         const userSnap = await getDoc(doc(db, "users", user.uid));
         if (userSnap.exists()) setRole(userSnap.data().role);
@@ -62,17 +56,14 @@ export default function LandingPage() {
 
   const handleJoin = (clubId: string) => {
     if (!user) {
-      // Redirect guests to auth page
       navigate("/auth");
     } else {
-      // TODO: Send join request logic here
       console.log(`Send join request for club: ${clubId}`);
     }
   };
 
   const handleInterested = (eventId: string) => {
     if (!user) {
-      // Redirect guests to auth page
       navigate("/auth");
     } else {
       setInterestedEvents((prev) => {
@@ -114,7 +105,17 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="bg-black text-white h-screen w-full snap-y snap-mandatory overflow-x-hidden">
+    <div className="bg-black text-white h-screen w-full snap-y snap-mandatory overflow-x-hidden scroll-smooth">
+      {/* Floating Login Button */}
+      <motion.button
+        className="fixed top-5 right-5 z-50 px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white shadow-lg hover:scale-105 transition"
+        onClick={() => navigate("/auth")}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        🚀 Login
+      </motion.button>
+
       {/* Hero Section */}
       <section className="h-screen flex flex-col justify-center items-center snap-start text-center px-6">
         <motion.h1
@@ -133,18 +134,37 @@ export default function LandingPage() {
         >
           A coder-first club management platform to connect leaders, members, and visitors seamlessly.
         </motion.p>
-        <motion.button
-          className="relative mt-6 px-8 py-3 rounded-full text-lg font-semibold bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/50"
-          onClick={() => navigate("/auth")}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          🚀 Login & Get Started
-        </motion.button>
+
+        {/* Replace login with 2 buttons */}
+        <div className="flex gap-4 mt-8">
+          <motion.button
+            className="px-6 py-3 rounded-full text-lg font-semibold bg-cyan-600 hover:bg-cyan-500 transition"
+            onClick={() => {
+              const section = document.getElementById("clubs-section");
+              section?.scrollIntoView({ behavior: "smooth" });
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            🌟 Explore Clubs
+          </motion.button>
+
+          <motion.button
+            className="px-6 py-3 rounded-full text-lg font-semibold bg-fuchsia-600 hover:bg-fuchsia-500 transition"
+            onClick={() => {
+              const section = document.getElementById("events-section");
+              section?.scrollIntoView({ behavior: "smooth" });
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            🎉 Explore Events
+          </motion.button>
+        </div>
       </section>
 
       {/* Featured Clubs */}
-      <section className="min-h-screen px-8 py-12 snap-start">
+      <section id="clubs-section" className="min-h-screen px-8 py-12 snap-start">
         <h2 className="text-3xl font-bold mb-8">🌟 Featured Clubs</h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {clubs.length === 0 ? (
@@ -154,19 +174,17 @@ export default function LandingPage() {
               <motion.div
                 key={club.id}
                 className={`bg-gray-900 rounded-xl p-6 shadow-lg transition cursor-pointer ${
-                  club.name === "Cy-Coders" 
-                    ? "hover:shadow-cyan-500/30 hover:scale-105 border border-transparent hover:border-cyan-500/50" 
+                  club.name === "Cy-Coders"
+                    ? "hover:shadow-cyan-500/30 hover:scale-105 border border-transparent hover:border-cyan-500/50"
                     : "hover:shadow-cyan-500/20"
                 }`}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 onClick={() => {
-                  // Navigate to specific club page based on club name
                   if (club.name === "Cy-Coders") {
                     navigate("/clubs/cy-coders");
                   } else {
-                    // For other clubs, you can add more specific routes later
                     navigate("/clubs-created");
                   }
                 }}
@@ -187,7 +205,7 @@ export default function LandingPage() {
                 )}
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent card click when button is clicked
+                    e.stopPropagation();
                     handleJoin(club.id);
                   }}
                   className="px-4 py-2 bg-cyan-600 rounded-lg hover:bg-cyan-500 transition"
@@ -205,7 +223,7 @@ export default function LandingPage() {
       </section>
 
       {/* Featured Events */}
-      <section className="min-h-screen px-8 py-12 snap-start">
+      <section id="events-section" className="min-h-screen px-8 py-12 snap-start">
         <h2 className="text-center text-3xl font-bold mb-8">🎉 Upcoming Events</h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {events.length === 0 ? (

@@ -15,7 +15,7 @@ import Profile from "./pages/Profile";
 import AdminClub from "./components/Panels/ADMIN/AdminClubs";
 import Navbar from "./components/Navbar";
 //import Footer from "./components/Footer";
-import ChatPage from "./pages/ChatPage";
+
 import CyCoders from "./pages/Clubs/Cy-Coders/Cy-Coders";
 
 export default function App() {
@@ -80,15 +80,7 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/clubs/:clubId/chat"
-            element={
-              <ProtectedRoute>
-                <ChatPage />
-              </ProtectedRoute>
-            }
-          />
-
+          
           <Route path="/not-authorized" element={<NotAuthorized />} />
           <Route path="/Profile" element={<Profile />} />
 
