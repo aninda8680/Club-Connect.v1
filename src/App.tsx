@@ -27,6 +27,7 @@ export default function App() {
     location.pathname === "/auth" ||
     location.pathname.startsWith("/clubs/") ||
     location.pathname === "/complete-profile";
+    location.pathname === "/Profile";
 
   return (
     <div className="h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
