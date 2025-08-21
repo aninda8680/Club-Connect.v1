@@ -21,7 +21,6 @@ export default function App() {
   const location = useLocation();
   const { user, loading, profileComplete } = useAuth();
 
-  // ✅ Hide navbar on landing, login, profile completion, and public club view
   const hideNavbar =
     location.pathname === "/" ||
     location.pathname === "/auth" ||
@@ -31,7 +30,7 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen overflow-x-hidden bg-black text-slate-200 font-mono">
-      {/* ✅ Navbar only when logged in + profile completed */}
+
       {!hideNavbar && user && profileComplete && <Navbar />}
 
       <main>
