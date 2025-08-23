@@ -5,7 +5,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiUser, FiPhone, FiCalendar, FiChevronDown } from "react-icons/fi";
+import { FiUser, FiPhone, FiCalendar, FiChevronDown, FiArrowLeft } from "react-icons/fi";
 
 export default function ProfileCompletionPage() {
   const { user, setProfileComplete } = useAuth();
@@ -78,6 +78,17 @@ export default function ProfileCompletionPage() {
             animate={{ scale: 1 }}
             transition={{ duration: 0.3 }}
           >
+            <motion.button
+              type="button"
+              onClick={() => navigate("/")}
+              className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 text-xs rounded-md bg-gray-800/80 border border-gray-700 text-gray-200 hover:bg-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 z-20"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              aria-label="Go to landing page"
+            >
+              <FiArrowLeft className="text-sm" />
+              <span>Back</span>
+            </motion.button>
             {/* Decorative elements */}
             <motion.div 
               className="absolute -top-20 -right-20 w-40 h-40 bg-white rounded-full opacity-10"
