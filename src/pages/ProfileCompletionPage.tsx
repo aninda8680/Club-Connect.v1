@@ -273,11 +273,11 @@ export default function ProfileCompletionPage() {
                     className="w-full pl-3 pr-8 py-2 text-sm rounded-lg bg-gray-800 border border-gray-700 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 appearance-none transition"
                   >
                     <option value="">Select Stream</option>
-                    <option value="cse">Computer Science & Engineering</option>
-                    <option value="ece">Electronics & Communication</option>
-                    <option value="mech">Mechanical Engineering</option>
-                    <option value="civil">Civil Engineering</option>
-                    <option value="electrical">Electrical Engineering</option>
+                    <option value="CSE">Computer Science & Engineering</option>
+                    <option value="ECE">Electronics & Communication</option>
+                    <option value="Mech">Mechanical Engineering</option>
+                    <option value="Civil">Civil Engineering</option>
+                    <option value="Electrical">Electrical Engineering</option>
                   </select>
                   <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
                 </div>
@@ -298,11 +298,11 @@ export default function ProfileCompletionPage() {
                     className="w-full pl-3 pr-8 py-2 text-sm rounded-lg bg-gray-800 border border-gray-700 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 appearance-none transition"
                   >
                     <option value="">Select Course</option>
-                    <option value="btech">B.Tech</option>
-                    <option value="mtech">M.Tech</option>
-                    <option value="bca">BCA</option>
-                    <option value="mca">MCA</option>
-                    <option value="diploma">Diploma</option>
+                    <option value="BTech">B.Tech</option>
+                    <option value="MTech">M.Tech</option>
+                    <option value="BCA">BCA</option>
+                    <option value="MCA">MCA</option>
+                    <option value="Diploma">Diploma</option>
                   </select>
                   <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
                 </div>

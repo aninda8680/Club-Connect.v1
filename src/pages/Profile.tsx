@@ -64,7 +64,7 @@ export default function Profile() {
     switch (role?.toLowerCase()) {
       case "admin":
         return "text-red-400";
-      case "leader":
+      case "coordinator":
         return "text-yellow-400";
       case "member":
         return "text-green-400";

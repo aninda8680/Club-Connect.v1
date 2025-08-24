@@ -619,7 +619,7 @@ export default function LandingPage() {
                 className="text-gray-400 mb-8 max-w-2xl"
                 variants={fadeUp}
               >
-                Join thousands of students and club leaders who are already using Club-Connect to revolutionize their campus organizations.
+                Join thousands of students and club coordinators who are already using Club-Connect to revolutionize their campus organizations.
               </motion.p>
               <motion.div variants={fadeUp}>
                 <motion.button

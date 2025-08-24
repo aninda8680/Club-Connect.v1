@@ -7,7 +7,7 @@ import { useAuth } from "../../../AuthContext";
 import { Star } from "lucide-react";
 import { ClubCard } from "../../ClubCard";
 import { motion } from "framer-motion";
-import { Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export default function PublicPanel() {
   const [clubs, setClubs] = useState<any[]>([]);
@@ -44,19 +44,39 @@ export default function PublicPanel() {
 
   const handleJoinRequest = async (clubId: string) => {
     if (!user) return;
-    const ref = doc(db, "clubs", clubId, "joinRequests", user.uid);
-    await setDoc(ref, {
-      email: user.email,
-      displayName: user.displayName || "",
-      status: "pending",
-      requestedAt: new Date(),
-    });
-    setJoinedClubs((prev) => new Set(prev).add(clubId));
+    
+    try {
+      const ref = doc(db, "clubs", clubId, "joinRequests", user.uid);
+      await setDoc(ref, {
+        name: user.displayName,
+        email: user.email,
+        stream: user.stream,  
+        course: user.course,  
+        status: "pending",
+        requestedAt: new Date(),
+      });
+      
+      
+      // Update local state
+      setJoinedClubs((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(clubId);
+        console.log("Updated joinedClubs:", Array.from(newSet));
+        return newSet;
+      });
+      
+      // Show success message
+      toast.success("Join request sent successfully!");
+    } catch (error) {
+      console.error("Error sending join request:", error);
+      toast.error("Failed to send join request. Please try again.");
+    }
   };
 
   return (
     <div className="snap-y snap-mandatory h-screen w-screen overflow-y-scroll overflow-x-hidden bg-black text-white">
-      <Toaster position="top-right" />
+      
+
 
       {/* Section 1: Hero Intro */}
       <section className="snap-start h-screen w-full flex flex-col items-center justify-center px-4 md:px-8 text-center space-y-4">
@@ -87,17 +107,21 @@ export default function PublicPanel() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {clubs.map((club) => (
-              <ClubCard
-                key={club.id}
-                club={club}
-                isJoined={joinedClubs.has(club.id)}
-                onJoin={handleJoinRequest}
-                role={role}
-                hovered={hoveredClub}
-                setHovered={setHoveredClub}
-              />
-            ))}
+            {clubs.map((club) => {
+              const isJoined = joinedClubs.has(club.id);
+              console.log(`Club ${club.name}: isJoined = ${isJoined}`);
+              return (
+                <ClubCard
+                  key={club.id}
+                  club={club}
+                  isJoined={isJoined}
+                  onJoin={handleJoinRequest}
+                  role={role}
+                  hovered={hoveredClub}
+                  setHovered={setHoveredClub}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
@@ -108,12 +132,12 @@ export default function PublicPanel() {
           Why Join a Club?
         </h2>
         <p className="text-gray-400 max-w-xl">
-          Clubs help you grow beyond academics — improve leadership, communication, and real-world project skills.
+          Clubs help you grow beyond academics — improve Coordinatorship, communication, and real-world project skills.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mt-6">
           <div className="bg-[#1e1e2e] p-6 rounded-xl border border-[#2d2d3d]">🤝 Network with peers</div>
           <div className="bg-[#1e1e2e] p-6 rounded-xl border border-[#2d2d3d]">🚀 Boost your portfolio</div>
-          <div className="bg-[#1e1e2e] p-6 rounded-xl border border-[#2d2d3d]">🎯 Learn leadership</div>
+          <div className="bg-[#1e1e2e] p-6 rounded-xl border border-[#2d2d3d]">🎯 Learn Coordinatorship</div>
           <div className="bg-[#1e1e2e] p-6 rounded-xl border border-[#2d2d3d]">💡 Build cool things</div>
         </div>
       </section>

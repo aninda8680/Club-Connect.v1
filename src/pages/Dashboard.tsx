@@ -6,7 +6,7 @@ import { db } from "../firebase";
 import { useAuth } from "../AuthContext";
 
 import AdminPanel from "../components/Panels/ADMIN/AdminPanel";
-import LeaderPanel from "../components/Panels/LEADER/LeaderPanel";
+import CoordinatorPanel from "../components/Panels/COORDINATOR/CoordinatorPanel";
 import MemberPanel from "../components/Panels/MEMBER/MemberPanel";
 import PublicPanel from "../components/Panels/PUBLIC/PublicPanel";
 
@@ -42,18 +42,12 @@ export default function Dashboard() {
     fetchUserRole();
   }, [user, navigate]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen w-screen flex items-center justify-center bg-black text-white">
-        <div className="animate-pulse text-xl">Loading Dashboard...</div>
-      </div>
-    );
-  }
+  
 
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       {role === "admin" && <AdminPanel />}
-      {role === "leader" && <LeaderPanel />}
+              {role === "coordinator" && <CoordinatorPanel />}
       {role === "member" && <MemberPanel />}
       {role === "visitor" && <PublicPanel />}
     </div>
