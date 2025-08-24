@@ -6,8 +6,10 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import PublicEventList from "./components/Panels/PUBLIC/PublicEventList";
-import LeaderEventsPanel from "./components/Panels/LEADER/LeaderEventsPanel";
-import LeaderMember from "./components/Panels/LEADER/LeaderMember";
+import CoordinatorEventsPanel from "./components/Panels/COORDINATOR/CoordinatorEventsPanel";
+import CoordinatorMember from "./components/Panels/COORDINATOR/CoordinatorMember/CoordinatorMember";
+import ClubMembers from "./components/Panels/COORDINATOR/CoordinatorMember/ClubMembers";
+import JoinRequests from "./components/Panels/COORDINATOR/CoordinatorMember/JoinRequests";
 import AdminClubDash from "./components/Panels/ADMIN/AdminClubDash";
 import NotAuthorized from "./pages/NotAuthorized";
 import AdminEventPage from "./components/Panels/ADMIN/AdminEvents";
@@ -25,7 +27,7 @@ export default function App() {
     location.pathname === "/" ||
     location.pathname === "/auth" ||
     location.pathname.startsWith("/clubs/") ||
-    location.pathname === "/complete-profile";
+    location.pathname === "/complete-profile" ||
     location.pathname === "/Profile";
 
   return (
@@ -35,13 +37,13 @@ export default function App() {
 
       <main>
         <Routes>
-          {/* Public routes → no firebase wait */}
+          {/* 🌍 Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/clubs/cy-coders" element={<CyCoders />} />
           <Route path="/events" element={<PublicEventList />} />
 
-          {/* ✅ Profile completion (wait for firebase) */}
+          {/* 👤 Profile completion */}
           <Route
             path="/complete-profile"
             element={
@@ -59,7 +61,7 @@ export default function App() {
             }
           />
 
-          {/* ✅ Dashboard (wait for firebase) */}
+          {/* 📊 Dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -77,34 +79,15 @@ export default function App() {
             }
           />
 
-          {/* Other protected routes */}
+          {/* 🛠️ Admin routes */}
           <Route
             path="/AdminClub"
             element={
-              <ProtectedRoute requireAuth>
+              <RoleProtectedRoute allowedRoles={["admin"]}>
                 <AdminClub />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             }
           />
-
-          <Route
-            path="/LeaderEvents"
-            element={
-              <ProtectedRoute requireAuth>
-                <LeaderEventsPanel />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/manage"
-            element={
-              <ProtectedRoute requireAuth>
-                <LeaderMember />
-              </ProtectedRoute>
-            }
-          />
-
           <Route
             path="/admin/clubs/:clubId"
             element={
@@ -113,23 +96,74 @@ export default function App() {
               </RoleProtectedRoute>
             }
           />
-
-          <Route path="/not-authorized" element={<NotAuthorized />} />
-          <Route path="/Profile" element={<Profile />} />
-
           <Route
             path="/AdminEvents"
             element={
-              <ProtectedRoute requireAuth>
+              <RoleProtectedRoute allowedRoles={["admin"]}>
                 <AdminEventPage />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             }
           />
 
-          {/* ✅ Catch-all fallback */}
+
+
+
+
+
+          {/* 🎯 Coordinator routes */}
+          <Route
+            path="/CoordinatorEvents"
+            element={
+              <RoleProtectedRoute allowedRoles={["coordinator"]}>
+                <CoordinatorEventsPanel />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/coordinator-member"
+            element={
+              <RoleProtectedRoute allowedRoles={["coordinator"]}>
+                <CoordinatorMember />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/club-members"
+            element={
+              <RoleProtectedRoute allowedRoles={["coordinator"]}>
+                <ClubMembers />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/join-requests"
+            element={
+              <RoleProtectedRoute allowedRoles={["coordinator"]}>
+                <JoinRequests />
+              </RoleProtectedRoute>
+            }
+          />
+
+
+
+
+
+          
+
+          {/* 👤 Profile & auth pages */}
+          <Route path="/Profile" element={<Profile />} />
+          <Route path="/not-authorized" element={<NotAuthorized />} />
+
+          {/* 🛑 Catch-all fallback */}
           <Route
             path="*"
-            element={<Navigate to={user ? "/dashboard" : "/"} replace />}
+            element={
+              user ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
           />
         </Routes>
       </main>
