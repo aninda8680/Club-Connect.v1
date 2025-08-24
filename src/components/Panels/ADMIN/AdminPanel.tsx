@@ -123,7 +123,7 @@ const AdminPanel = () => {
 
       setStats({
         totalClubs: clubs.length,
-        totalCoordinators: CoordinatorsSnap.docs.length,
+        totalCoordinators: coordinatorsSnap.docs.length,
         totalMembers: membersSnap.docs.length,
         pendingProposals: pendingProps.length,
         approvedEvents: approvedEvs.length,
