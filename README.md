@@ -1,13 +1,13 @@
 # ✨ Club-Connect 🚀
 
-A chill club management site for colleges 🏫 — built so admins, leaders, and members don’t lose their minds ✌️
+A chill club management site for colleges 🏫 — built so admins, Coordinators, and members don’t lose their minds ✌️
 
 ---
 
 ## 💡 What’s the vibe?
 
-👑 **Admins**: Boss mode. Create clubs, approve events, switch leaders.  
-🧑‍💼 **Leaders**: Handle club stuff. Accept peeps, pitch events.  
+👑 **Admins**: Boss mode. Create clubs, approve events, switch coordinators.  
+🧑‍💼 **Coordinators**: Handle club stuff. Accept peeps, pitch events.  
 👥 **Members**: Join clubs, see events, live the campus life.  
 👀 **Visitors**: Lurk around, check out what’s poppin'.
 
