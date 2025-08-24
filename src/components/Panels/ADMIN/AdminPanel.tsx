@@ -33,11 +33,11 @@ import { motion, AnimatePresence, useAnimation, useInView } from 'framer-motion'
 
 interface DashboardStats {
   totalClubs: number;
-  totalLeaders: number;
+  totalCoordinators: number;
   totalMembers: number;
   pendingProposals: number;
   approvedEvents: number;
-  activeLeaders: number;
+  activeCoordinators: number;
 }
 
 interface EventProposal {
@@ -52,7 +52,7 @@ interface EventProposal {
 
 interface Club {
   id: string;
-  leaderId: string;
+          coordinatorId: string;
   name: string;
   [key: string]: any;
 }
@@ -87,11 +87,11 @@ const ScrollAnimationWrapper = ({ children }: { children: React.ReactNode }) => 
 const AdminPanel = () => {
   const [stats, setStats] = useState<DashboardStats>({
     totalClubs: 0,
-    totalLeaders: 0,
+    totalCoordinators: 0,
     totalMembers: 0,
     pendingProposals: 0,
     approvedEvents: 0,
-    activeLeaders: 0
+            activeCoordinators: 0
   });
 
   const [pendingProposals, setPendingProposals] = useState<EventProposal[]>([]);
@@ -108,7 +108,7 @@ const AdminPanel = () => {
       const clubsSnap = await getDocs(collection(db, 'clubs'));
       const clubs = clubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Club));
 
-      const leadersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'leader')));
+              const coordinatorsSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'coordinator')));
       const membersSnap = await getDocs(query(collection(db, 'users'), where('role', '==', 'member')));
 
       const proposalsSnap = await getDocs(collectionGroup(db, 'eventProposals'));
@@ -119,15 +119,15 @@ const AdminPanel = () => {
       const eventsSnap = await getDocs(collectionGroup(db, 'events'));
       const approvedEvs = eventsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const activeLeaderIds = new Set(clubs.map(club => club.leaderId));
+      const activeCoordinatorIds = new Set(clubs.map(club => club.coordinatorId));
 
       setStats({
         totalClubs: clubs.length,
-        totalLeaders: leadersSnap.docs.length,
+        totalCoordinators: CoordinatorsSnap.docs.length,
         totalMembers: membersSnap.docs.length,
         pendingProposals: pendingProps.length,
         approvedEvents: approvedEvs.length,
-        activeLeaders: activeLeaderIds.size
+        activeCoordinators: activeCoordinatorIds.size
       });
 
       setPendingProposals(pendingProps.slice(0, 5));
@@ -246,10 +246,10 @@ const AdminPanel = () => {
                       <div className="p-2 bg-purple-900/50 rounded-lg border border-purple-800/50">
                         <FiUsers className="w-5 h-5 text-purple-400" />
                       </div>
-                      <h4 className="font-medium text-white">Manage Leaders</h4>
-                      <p className="text-xs text-slate-400">Configure leadership roles</p>
+                      <h4 className="font-medium text-white">Manage Coordinators</h4>
+                      <p className="text-xs text-slate-400">Configure Coordinatorship roles</p>
                       <div className="mt-2 text-xs font-mono text-purple-300 bg-purple-900/30 px-2 py-1 rounded">
-                        $ admin config --leaders
+                        $ admin config --Coordinators
                       </div>
                     </Link>
                   </motion.div>
@@ -384,7 +384,7 @@ const AdminPanel = () => {
                   <div className="space-y-3 text-sm sm:text-base">
                     {[
                       { label: 'Active Clubs', value: stats.totalClubs, icon: <Terminal className="w-4 h-4 text-blue-400" /> },
-                      { label: 'Leaders Assigned', value: stats.activeLeaders, icon: <Code className="w-4 h-4 text-purple-400" /> },
+                      { label: 'Coordinators Assigned', value: stats.activeCoordinators, icon: <Code className="w-4 h-4 text-purple-400" /> },
                       { label: 'Pending Reviews', value: stats.pendingProposals, icon: <Cpu className="w-4 h-4 text-amber-400" /> },
                       { label: 'Total Events', value: stats.approvedEvents, icon: <Database className="w-4 h-4 text-emerald-400" /> }
                     ].map((item, index) => (

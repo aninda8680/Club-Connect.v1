@@ -55,31 +55,31 @@ const ScrollAnimationWrapper = ({ children }: { children: React.ReactNode }) => 
 };
 
 export default function AdminClub() {
-  const [leaders, setLeaders] = useState<any[]>([]);
+  const [coordinators, setCoordinators] = useState<any[]>([]);
   const [clubName, setClubName] = useState("");
-  const [selectedLeader, setSelectedLeader] = useState("");
+  const [selectedCoordinator, setSelectedCoordinator] = useState("");
   const [clubs, setClubs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [selectedLeaderName, setSelectedLeaderName] = useState<string | null>(null);
+  const [selectedCoordinatorName, setSelectedCoordinatorName] = useState<string | null>(null);
   const [showClubList] = useState(true);
   const [deletingClub, setDeletingClub] = useState<string | null>(null);
 
-  // Fetch all leaders
+  // Fetch all coordinators
   useEffect(() => {
-    const fetchLeaders = async () => {
+    const fetchCoordinators = async () => {
       setIsLoading(true);
-      const q = query(collection(db, "users"), where("role", "==", "leader"));
+      const q = query(collection(db, "users"), where("role", "==", "coordinator"));
       const querySnapshot = await getDocs(q);
-      const leadersData = querySnapshot.docs.map((doc) => ({
+      const coordinatorsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setLeaders(leadersData);
+      setCoordinators(coordinatorsData);
       setIsLoading(false);
     };
-    fetchLeaders();
+    fetchCoordinators();
   }, []);
 
   // Fetch all clubs
@@ -96,31 +96,31 @@ export default function AdminClub() {
     fetchClubs();
   }, []);
 
-  // Update selectedLeaderName when selectedLeader changes
+  // Update selectedCoordinatorName when selectedCoordinator changes
   useEffect(() => {
-    if (!selectedLeader) {
-      setSelectedLeaderName(null);
+    if (!selectedCoordinator) {
+      setSelectedCoordinatorName(null);
       return;
     }
-    const leader = leaders.find((l) => l.id === selectedLeader);
-    setSelectedLeaderName(
-      leader?.displayName || leader?.name || leader?.email || null
+    const coordinator = coordinators.find((c) => c.id === selectedCoordinator);
+    setSelectedCoordinatorName(
+      coordinator?.displayName || coordinator?.name || coordinator?.email || null
     );
-  }, [selectedLeader, leaders]);
+  }, [selectedCoordinator, coordinators]);
 
   const handleCreateClub = async () => {
-    if (!clubName || !selectedLeader) return alert("Fill all fields");
+    if (!clubName || !selectedCoordinator) return alert("Fill all fields");
     setIsCreating(true);
     try {
       await addDoc(collection(db, "clubs"), {
         name: clubName,
         description: "",
         createdAt: Timestamp.now(),
-        leaderId: selectedLeader,
+        coordinatorId: selectedCoordinator,
         clubId: `${clubName.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
       });
       setClubName("");
-      setSelectedLeader("");
+      setSelectedCoordinator("");
       setNotification({ type: "success", message: "Club created!" });
       fetchClubs();
     } catch (err) {
@@ -132,10 +132,10 @@ export default function AdminClub() {
     }
   };
 
-  // Helper to get leader's name by id
-  const getLeaderName = (leaderId: string) => {
-    const leader = leaders.find((l) => l.id === leaderId);
-    return leader?.displayName || leader?.name || leader?.email || "Unknown";
+  // Helper to get coordinator's name by id
+  const getCoordinatorName = (coordinatorId: string) => {
+    const coordinator = coordinators.find((c) => c.id === coordinatorId);
+    return coordinator?.displayName || coordinator?.name || coordinator?.email || "Unknown";
   };
 
   // Confirm and delete club
@@ -227,8 +227,8 @@ export default function AdminClub() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm font-medium">Available Leaders</p>
-                    <p className="text-2xl font-bold text-white font-mono">{leaders.length}</p>
+                    <p className="text-slate-400 text-sm font-medium">Available Coordinators</p>
+                    <p className="text-2xl font-bold text-white font-mono">{coordinators.length}</p>
                   </div>
                   <div className="p-3 bg-purple-500/20 rounded-lg">
                     <Code className="w-6 h-6 text-purple-400" />
@@ -242,8 +242,8 @@ export default function AdminClub() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm font-medium">Active Leaders</p>
-                    <p className="text-2xl font-bold text-white font-mono">{new Set(clubs.map(c => c.leaderId)).size}</p>
+                    <p className="text-slate-400 text-sm font-medium">Active Coordinators</p>
+                    <p className="text-2xl font-bold text-white font-mono">{new Set(clubs.map(c => c.coordinatorId)).size}</p>
                   </div>
                   <div className="p-3 bg-emerald-500/20 rounded-lg">
                     <Crown className="w-6 h-6 text-emerald-400" />
@@ -288,21 +288,21 @@ export default function AdminClub() {
 
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-slate-300 uppercase tracking-wide">
-                      Club Leader
+                      Club Coordinator
                     </label>
                     <div className="relative">
                       <select
-                        value={selectedLeader}
-                        onChange={(e) => setSelectedLeader(e.target.value)}
+                        value={selectedCoordinator}
+                        onChange={(e) => setSelectedCoordinator(e.target.value)}
                         disabled={isLoading}
                         className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer disabled:opacity-50 font-mono"
                       >
                         <option value="">
-                          {isLoading ? "Loading leaders..." : "-- Select Leader --"}
+                          {isLoading ? "Loading coordinators..." : "-- Select Coordinator --"}
                         </option>
-                        {leaders.map((leader) => (
-                          <option key={leader.id} value={leader.id} className="bg-slate-800">
-                            {leader.displayName || leader.name || leader.email}
+                        {coordinators.map((coordinator) => (
+                          <option key={coordinator.id} value={coordinator.id} className="bg-slate-800">
+                            {coordinator.displayName || coordinator.name || coordinator.email}
                           </option>
                         ))}
                       </select>
@@ -316,7 +316,7 @@ export default function AdminClub() {
                     </div>
                   </div>
 
-                  {selectedLeaderName && (
+                  {selectedCoordinatorName && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -325,12 +325,12 @@ export default function AdminClub() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-bold text-sm">
-                            {selectedLeaderName.charAt(0)}
+                            {selectedCoordinatorName.charAt(0)}
                           </span>
                         </div>
                         <div>
-                          <p className="text-white font-medium">Selected Leader</p>
-                          <p className="text-blue-400 text-sm font-mono">{selectedLeaderName}</p>
+                          <p className="text-white font-medium">Selected Coordinator</p>
+                          <p className="text-blue-400 text-sm font-mono">{selectedCoordinatorName}</p>
                         </div>
                       </div>
                     </motion.div>
@@ -341,7 +341,7 @@ export default function AdminClub() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleCreateClub}
-                      disabled={isCreating || !clubName.trim() || !selectedLeader}
+                      disabled={isCreating || !clubName.trim() || !selectedCoordinator}
                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-slate-700 disabled:to-slate-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
                     >
                       {isCreating ? (
@@ -420,7 +420,7 @@ export default function AdminClub() {
                                     <div className="space-y-1 text-sm">
                                       <div className="flex items-center gap-2 text-slate-300">
                                         <Crown className="w-4 h-4 text-purple-400" />
-                                        <span>Leader: {getLeaderName(club.leaderId)}</span>
+                                        <span>Coordinator: {getCoordinatorName(club.coordinatorId)}</span>
                                       </div>
                                       <div className="flex items-center gap-2 text-slate-400">
                                         <Calendar className="w-4 h-4 text-blue-400" />

@@ -20,7 +20,7 @@ export default function AdminClubDash() {
   const navigate = useNavigate();
 
   const [club, setClub] = useState<any>(null);
-  const [leader, setLeader] = useState<any>(null);
+  const [coordinator, setCoordinator] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
@@ -38,12 +38,12 @@ export default function AdminClubDash() {
 
         const clubData = {
           id: clubDoc.id,
-          ...(clubDoc.data() as { leaderId: string; [key: string]: any }),
+          ...(clubDoc.data() as { coordinatorId: string; [key: string]: any }),
         };
         setClub(clubData);
 
-        const leaderDoc = await getDoc(doc(db, "users", clubData.leaderId));
-        setLeader(leaderDoc.exists() ? leaderDoc.data() : null);
+        const coordinatorDoc = await getDoc(doc(db, "users", clubData.coordinatorId));
+        setCoordinator(coordinatorDoc.exists() ? coordinatorDoc.data() : null);
 
         const membersSnap = await getDocs(collection(db, `clubs/${clubId}/members`));
         setMembers(membersSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
@@ -126,28 +126,28 @@ export default function AdminClubDash() {
                 <div className="border border-green-800 rounded-lg p-4">
                   <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                     <Crown className="w-5 h-5" />
-                    Leader Details
+                    Coordinator Details
                   </h3>
-                  {leader ? (
+                  {coordinator ? (
                     <div className="space-y-3">
-                      <p><span className="text-green-700">Name:</span> {leader.displayName}</p>
-                      <p><span className="text-green-700">Email:</span> {leader.email}</p>
-                      <p><span className="text-green-700">Role:</span> {leader.role}</p>
+                      <p><span className="text-green-700">Name:</span> {coordinator.displayName}</p>
+                      <p><span className="text-green-700">Email:</span> {coordinator.email}</p>
+                      <p><span className="text-green-700">Role:</span> {coordinator.role}</p>
                       <button 
                         onClick={() => {
-                          const newLeader = prompt("Enter new leader's email:");
-                          if (newLeader) {
-                            // Implement leader change logic here
-                            alert(`Leader change request for: ${newLeader}`);
+                          const newCoordinator = prompt("Enter new coordinator's email:");
+                          if (newCoordinator) {
+                            // Implement coordinator change logic here
+                            alert(`Coordinator change request for: ${newCoordinator}`);
                           }
                         }}
                         className="mt-4 text-xs bg-green-900 hover:bg-green-800 text-green-300 px-3 py-1 rounded border border-green-800"
                       >
-                        Change Leader
+                        Change Coordinator
                       </button>
                     </div>
                   ) : (
-                    <p className="text-green-700">No leader information available</p>
+                    <p className="text-green-700">No coordinator information available</p>
                   )}
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default function AdminClubDash() {
                           <td className="p-3 text-green-600">{member.email}</td>
                           <td className="p-3">
                             <span className={`px-2 py-1 rounded text-xs ${
-                              member.role === 'leader' 
+                              member.role === 'coordinator' 
                                 ? 'bg-green-900 text-green-300' 
                                 : 'bg-gray-800 text-green-400'
                             }`}>
