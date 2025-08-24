@@ -12,55 +12,23 @@ type Props = {
 };
 
 export default function RoleProtectedRoute({ children, allowedRoles }: Props) {
-  const { user } = useAuth();
-  const [role, setRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
   const [accessDenied, setAccessDenied] = useState(false);
+  const [minLoadingTime, setMinLoadingTime] = useState(true);
 
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+    if (!authLoading) {
+      // Wait at least 500ms to prevent flash
+      const timer = setTimeout(() => setMinLoadingTime(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [authLoading]);
 
-      try {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const userRole = userSnap.data().role;
-          if (typeof userRole === "string") {
-            setRole(userRole);
-          } else {
-            console.warn("⚠️ Invalid role format");
-            setRole(null);
-          }
-        } else {
-          console.warn("⚠️ No user document found");
-          setRole(null);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching user role:", error);
-        setRole(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserRole();
-  }, [user]);
-
-  // Redirect if not authenticated
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Show loading spinner
-  if (loading) {
+  // Wait for auth to finish loading AND minimum time
+  if (authLoading || minLoadingTime) {
     return (
-      <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-slate-900 text-white">
-        <p className="text-xl mb-4 animate-pulse">🔄 Checking access permissions...</p>
+      <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-black text-white">
+        <p className="text-xl mb-4 animate-pulse">Wait for a while...!!!!</p>
         <div className="relative">
           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
           <div className="absolute inset-0 w-8 h-8 m-auto border-4 border-transparent border-t-purple-400 rounded-full animate-spin animate-reverse"></div>
@@ -69,8 +37,13 @@ export default function RoleProtectedRoute({ children, allowedRoles }: Props) {
     );
   }
 
+  // Redirect if not authenticated
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
   // Role check failed
-  if (!role || !allowedRoles.includes(role)) {
+  if (!user.role || !allowedRoles.includes(user.role)) {
     if (!accessDenied) {
       toast.error("🚫 Access Denied: You are not authorized to view this page.");
       setAccessDenied(true); // prevent duplicate toasts

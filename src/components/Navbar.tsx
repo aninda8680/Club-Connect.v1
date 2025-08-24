@@ -16,22 +16,22 @@ export default function Navbar() {
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
   const baseLinks = [
-    { to: "/dashboard", label: "Dashboard", roles: ["admin", "leader", "member", "visitor"] },
+            { to: "/dashboard", label: "Dashboard", roles: ["admin", "coordinator", "member", "visitor"] },
     { to: "/AdminClub", label: "Clubs", roles: ["admin"] },
     { to: "/AdminEvents", label: "Events", roles: ["admin"] },
-    { to: "/LeaderEvents", label: "Events", roles: ["leader"] },
-    { to: "/manage", label: "Members", roles: ["leader"] },
+            { to: "/CoordinatorEvents", label: "Events", roles: ["coordinator"] },
+        { to: "/coordinator-member", label: "Members", roles: ["coordinator"] },
     { to: "/events", label: "Events", roles: ["member", "visitor"] },
   ];
 
   const navLinks = [...baseLinks];
 
-  // add Chat for members/leaders of a club
-  if (["member", "leader"].includes(role) && clubId) {
+      // add Chat for members/coordinators of a club
+    if (["member", "coordinator"].includes(role) && clubId) {
     navLinks.push({
       to: `/clubs/${clubId}/chat`,
       label: "Chat",
-      roles: ["member", "leader"],
+              roles: ["member", "coordinator"],
     });
   }
 
@@ -39,7 +39,7 @@ export default function Navbar() {
     switch (role) {
       case "admin":
         return <Crown className="w-4 h-4 text-yellow-400" />;
-      case "leader":
+      case "coordinator":
         return <Shield className="w-4 h-4 text-purple-400" />;
       case "member":
         return <User className="w-4 h-4 text-blue-400" />;
