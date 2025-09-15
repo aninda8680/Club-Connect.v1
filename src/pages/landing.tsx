@@ -165,18 +165,20 @@ export default function LandingPage() {
   const AuroraBackground = () => {
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
-    
+
+    // This check prevents an error on server-side rendering or non-browser environments
+    const isBrowser = typeof window !== 'undefined';
+    const rotateX = isBrowser ? useTransform(mouseY, [0, window.innerHeight], [15, -15]) : 0;
+    const rotateY = isBrowser ? useTransform(mouseX, [0, window.innerWidth], [-15, 15]) : 0;
+
     const handleMouseMove = (e: React.MouseEvent) => {
       const { clientX, clientY } = e;
       mouseX.set(clientX);
       mouseY.set(clientY);
     };
 
-    const rotateX = useTransform(mouseY, [0, window.innerHeight], [15, -15]);
-    const rotateY = useTransform(mouseX, [0, window.innerWidth], [-15, 15]);
-
     return (
-      <motion.div 
+      <motion.div
         className="fixed inset-0 overflow-hidden pointer-events-none z-0"
         onMouseMove={handleMouseMove}
         style={{ rotateX, rotateY }}
@@ -257,7 +259,7 @@ export default function LandingPage() {
 
       {/* Floating Login Button */}
       <motion.button
-        className="fixed top-5 right-5 z-50 px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-red-600 to-red-800 text-white shadow-lg backdrop-blur-sm border border-red-900/50"
+        className="fixed top-4 right-4 z-50 px-4 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-red-600 to-red-800 text-white shadow-lg backdrop-blur-sm border border-red-900/50"
         onClick={() => navigate("/auth")}
         animate={{
           boxShadow: [
@@ -274,105 +276,105 @@ export default function LandingPage() {
       </motion.button>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex flex-col justify-center items-center px-6 relative overflow-hidden z-10">
-      <div className="relative z-20 text-center">
-        
-        {/* Main Title */}
-        <motion.h1
-          className="text-5xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600"
-          initial={{ opacity: 0, y: -60 }}
+      <section className="min-h-screen flex flex-col justify-center items-center text-center px-4 md:px-6 relative overflow-hidden z-10">
+        <div className="relative z-20">
+          
+          {/* Main Title */}
+          <motion.h1
+            className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600"
+            initial={{ opacity: 0, y: -60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, type: "spring", stiffness: 80 }}
+          >
+            Welcome to <span className="text-red-500">Club-Connect</span> ⚡
+          </motion.h1>
+
+          {/* GenZ Typewriter Heading */}
+          <motion.h2
+            className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-200 mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            <Typewriter
+              words={[
+                "Grades fade. Memories don’t.",
+                "Because college is not just 9 to 5.",
+                "More than attendance, it’s about presence.",
+                "Forget library hours. These are club hours.",
+                "Every club is a playlist. Find yours."
+              ]}
+              loop={true}
+              cursor
+              cursorStyle="|"
+              typeSpeed={60}
+              deleteSpeed={40}
+              delaySpeed={2000}
+            />
+          </motion.h2>
+
+          {/* Subheading */}
+          <motion.h3
+            className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            After classes comes the real fun — clubs, events, and memories waiting to happen.
+          </motion.h3>
+
+          {/* Buttons */}
+          <motion.div
+            className="flex flex-col sm:flex-row justify-center gap-4 mt-8 md:mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.8, duration: 0.8 }}
+          >
+            <motion.button
+              className="px-6 py-3 rounded-full text-base font-semibold bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 transition flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                const section = document.getElementById("clubs-section");
+                section?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              🌟 Explore Clubs <FiArrowRight />
+            </motion.button>
+
+            <motion.button
+              className="px-6 py-3 rounded-full text-base font-semibold bg-black border-2 border-red-600 hover:bg-red-900/30 transition flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                const section = document.getElementById("events-section");
+                section?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              🎉 Explore Events <FiArrowRight />
+            </motion.button>
+          </motion.div>
+        </div>
+
+        {/* Scrolling indicator */}
+        <motion.div
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, type: "spring", stiffness: 80 }}
+          transition={{ delay: 2.5 }}
         >
-          Welcome to <span className="text-red-500">Club-Connect</span> ⚡
-        </motion.h1>
-
-        {/* GenZ Typewriter Heading */}
-        <motion.h2
-          className="text-3xl md:text-4xl font-semibold text-gray-200 mb-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-        >
-          <Typewriter
-            words={[
-              "Grades fade. Memories don’t.",
-              "Because college is not just 9 to 5.",
-              "More than attendance, it’s about presence.",
-              "Forget library hours. These are club hours.",
-              "Every club is a playlist. Find yours."
-            ]}
-            loop={true}
-            cursor
-            cursorStyle="|"
-            typeSpeed={60}
-            deleteSpeed={40}
-            delaySpeed={2000}
-          />
-        </motion.h2>
-
-        {/* Subheading */}
-        <motion.h3
-          className="text-lg text-gray-400 max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-        >
-          After classes comes the real fun — clubs, events, and memories waiting to happen.
-        </motion.h3>
-
-        {/* Buttons */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-4 mt-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.8 }}
-        >
-          <motion.button
-            className="px-8 py-3 rounded-full text-lg font-semibold bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 transition flex items-center gap-2"
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={() => {
-              const section = document.getElementById("clubs-section");
-              section?.scrollIntoView({ behavior: "smooth" });
-            }}
+          <span className="text-sm text-gray-400 mb-2">Scroll Down</span>
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            🌟 Explore Clubs <FiArrowRight />
-          </motion.button>
-
-          <motion.button
-            className="px-8 py-3 rounded-full text-lg font-semibold bg-black border-2 border-red-600 hover:bg-red-900/30 transition flex items-center gap-2"
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={() => {
-              const section = document.getElementById("events-section");
-              section?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            🎉 Explore Events <FiArrowRight />
-          </motion.button>
+            <div className="w-4 h-4 border-r-2 border-b-2 border-red-500 transform rotate-45"></div>
+          </motion.div>
         </motion.div>
-      </div>
-
-      {/* Scrolling indicator */}
-      <motion.div
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.5 }}
-      >
-        <span className="text-sm text-gray-400 mb-2">Scroll Down</span>
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <div className="w-4 h-4 border-r-2 border-b-2 border-red-500 transform rotate-45"></div>
-        </motion.div>
-      </motion.div>
-    </section>
+      </section>
 
       {/* Featured Clubs */}
-      <section id="clubs-section" className="min-h-screen py-20 px-6 relative z-10 bg-gradient-to-b from-black/80 to-black">
+      <section id="clubs-section" className="min-h-screen py-20 px-4 md:px-6 relative z-10 bg-gradient-to-b from-black/80 to-black">
         <div className="container mx-auto">
           <motion.h2
             className="text-center text-3xl font-bold mb-4"
@@ -401,7 +403,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
           >
             {clubs.length === 0 ? (
-              <p className="text-gray-400">No clubs available right now.</p>
+              <p className="text-gray-400 text-center col-span-full">No clubs available right now.</p>
             ) : (
               clubs.map((club) => (
                 <motion.div
@@ -416,6 +418,7 @@ export default function LandingPage() {
                     if (club.name === "Cy-Coders") {
                       navigate("/clubs/cy-coders");
                     } else {
+                      // Navigate to a new page or show a modal for other clubs
                       navigate("/clubs-created");
                     }
                   }}
@@ -429,11 +432,11 @@ export default function LandingPage() {
                         animate={{ scale: 1 }}
                         transition={{ type: "spring", stiffness: 150 }}
                       >
-                        <FiStar size={12} /> About
+                        <FiStar size={12} /> Featured
                       </motion.span>
                     )}
                   </div>
-                  <p className="text-gray-400 text-sm mb-6">{club.description}</p>
+                  <p className="text-gray-400 text-sm mb-6 line-clamp-3">{club.description}</p>
                   {club.name === "Cy-Coders" && (
                     <p className="text-xs text-red-400 mb-4 flex items-center gap-1">
                       <span>👆 Click to explore this featured club</span>
@@ -463,7 +466,7 @@ export default function LandingPage() {
 
       {/* Testimonials Widget */}
       <section className="py-20 relative z-10 bg-black/60 backdrop-blur-sm">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.h2
             className="text-center text-3xl font-bold mb-12"
             initial={{ opacity: 0, y: 40 }}
@@ -478,25 +481,23 @@ export default function LandingPage() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={testimonials[activeTestimonial].id}
-                className="bg-gray-900/70 border border-gray-800 rounded-xl p-8 absolute inset-0 backdrop-blur-sm"
+                className="bg-gray-900/70 border border-gray-800 rounded-xl p-8 absolute inset-0 backdrop-blur-sm flex flex-col justify-center"
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="flex flex-col h-full justify-center">
-                  <div className="text-red-500 mb-4">
-                    <FiStar className="inline mr-1" />
-                    <FiStar className="inline mr-1" />
-                    <FiStar className="inline mr-1" />
-                    <FiStar className="inline mr-1" />
-                    <FiStar className="inline" />
-                  </div>
-                  <p className="text-lg italic mb-6">"{testimonials[activeTestimonial].text}"</p>
-                  <div>
-                    <p className="font-bold">{testimonials[activeTestimonial].name}</p>
-                    <p className="text-gray-400 text-sm">{testimonials[activeTestimonial].role}</p>
-                  </div>
+                <div className="text-red-500 mb-4">
+                  <FiStar className="inline mr-1" />
+                  <FiStar className="inline mr-1" />
+                  <FiStar className="inline mr-1" />
+                  <FiStar className="inline mr-1" />
+                  <FiStar className="inline" />
+                </div>
+                <p className="text-lg italic mb-6 line-clamp-3">"{testimonials[activeTestimonial].text}"</p>
+                <div>
+                  <p className="font-bold">{testimonials[activeTestimonial].name}</p>
+                  <p className="text-gray-400 text-sm">{testimonials[activeTestimonial].role}</p>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -515,7 +516,7 @@ export default function LandingPage() {
       </section>
 
       {/* Featured Events */}
-      <section id="events-section" className="min-h-screen py-20 px-6 relative z-10 bg-gradient-to-b from-black/80 to-black">
+      <section id="events-section" className="min-h-screen py-20 px-4 md:px-6 relative z-10 bg-gradient-to-b from-black/80 to-black">
         <div className="container mx-auto">
           <motion.h2
             className="text-center text-3xl font-bold mb-4"
@@ -538,7 +539,7 @@ export default function LandingPage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {events.length === 0 ? (
-              <p className="text-gray-400">No events available right now.</p>
+              <p className="text-gray-400 text-center col-span-full">No events available right now.</p>
             ) : (
               events.map((event, i) => (
                 <motion.div
@@ -599,7 +600,7 @@ export default function LandingPage() {
 
       {/* CTA Section */}
       <section className="py-20 relative z-10 bg-black/70 backdrop-blur-sm">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.div
             className="bg-gradient-to-r from-black to-gray-900 rounded-2xl p-8 md:p-12 border border-gray-800 shadow-2xl overflow-hidden relative"
             initial="hidden"
