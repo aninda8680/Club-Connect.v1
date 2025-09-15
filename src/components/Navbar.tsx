@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Crown, Shield, User, Globe } from "lucide-react";
 
 export default function Navbar() {
-  const { user, loading } = useAuth();  const role = (user as any)?.role;
-
+  const { user, loading } = useAuth();
+  const role = (user as any)?.role;
   const clubId = (user as any)?.clubId;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -16,22 +16,22 @@ export default function Navbar() {
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
   const baseLinks = [
-            { to: "/dashboard", label: "Dashboard", roles: ["admin", "coordinator", "member", "visitor"] },
+    { to: "/dashboard", label: "Dashboard", roles: ["admin", "coordinator", "member", "visitor"] },
     { to: "/AdminClub", label: "Clubs", roles: ["admin"] },
     { to: "/AdminEvents", label: "Events", roles: ["admin"] },
-            { to: "/CoordinatorEvents", label: "Events", roles: ["coordinator"] },
-        { to: "/coordinator-member", label: "Members", roles: ["coordinator"] },
+    { to: "/CoordinatorEvents", label: "Events", roles: ["coordinator"] },
+    { to: "/coordinator-member", label: "Members", roles: ["coordinator"] },
     { to: "/events", label: "Events", roles: ["member", "visitor"] },
   ];
 
   const navLinks = [...baseLinks];
 
-      // add Chat for members/coordinators of a club
-    if (["member", "coordinator"].includes(role) && clubId) {
+  // add Chat for members/coordinators of a club
+  if (["member", "coordinator"].includes(role) && clubId) {
     navLinks.push({
       to: `/clubs/${clubId}/chat`,
       label: "Chat",
-              roles: ["member", "coordinator"],
+      roles: ["member", "coordinator"],
     });
   }
 
@@ -53,7 +53,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* mobile overlay */}
+      {/* Mobile overlay and menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -67,20 +67,20 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      <nav className="top-0 left-0 w-full backdrop-blur-md bg-slate-900/80 border-b border-slate-700/50 text-white px-6 py-3 flex justify-between items-center shadow-2xl z-50">
+      <nav className="sticky top-0 left-0 w-full backdrop-blur-md bg-slate-900/80 border-b border-slate-700/50 text-white px-4 md:px-6 py-3 flex justify-between items-center shadow-2xl z-50">
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center space-x-3 group">
+        <Link to="/dashboard" className="flex items-center space-x-2 md:space-x-3 group">
           <motion.div
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
               <span className="text-white font-bold text-lg">CC</span>
             </div>
           </motion.div>
           <div className="hidden sm:block">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Club Connect
             </span>
           </div>
@@ -122,7 +122,7 @@ export default function Navbar() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex items-center space-x-4 ml-4"
             >
-              <div className="flex items-center space-x-2 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700/50">
+              <div className="hidden lg:flex items-center space-x-2 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700/50">
                 {getRoleIcon()}
                 <span className="text-sm font-medium">
                   {user.displayName || user.email?.split("@")[0]}
@@ -140,21 +140,21 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile right menu */}
+        {/* Mobile menu container */}
         <div className="md:hidden flex items-center space-x-4">
           {user && (
             <Link
               to="/profile"
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white"
             >
-              <FaUserCircle className="text-xl" />
+              <FaUserCircle className="text-lg" />
             </Link>
           )}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleMenu}
-            className="relative p-2 text-3xl focus:outline-none text-gray-300 hover:text-white"
+            className="relative p-2 text-2xl focus:outline-none text-gray-300 hover:text-white"
           >
             <motion.div
               animate={{ rotate: isMenuOpen ? 180 : 0 }}
@@ -164,6 +164,49 @@ export default function Navbar() {
             </motion.div>
           </motion.button>
         </div>
+
+        {/* Mobile menu (full-screen) */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.3 }}
+              className="fixed inset-y-0 right-0 w-full max-w-xs bg-slate-900/95 backdrop-blur-md border-l border-slate-700/50 z-50 p-6 flex flex-col space-y-6"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  Menu
+                </span>
+                <button
+                  onClick={toggleMenu}
+                  className="text-3xl text-gray-400 hover:text-white"
+                >
+                  <HiX />
+                </button>
+              </div>
+              <div className="flex flex-col space-y-4">
+                {navLinks.map((link) => {
+                  if (!link.roles.includes(role)) return null;
+                  const isActive = location.pathname === link.to;
+                  return (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      className={`text-lg font-medium py-3 px-4 rounded-lg transition-colors ${
+                        isActive ? "bg-slate-700 text-white" : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                      }`}
+                      onClick={toggleMenu}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </>
   );
